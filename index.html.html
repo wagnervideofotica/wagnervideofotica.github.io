@@ -1,0 +1,2319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SC-27 Ovinos v5.1-18062026-2037</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --soil:    #1a1510;
+  --bark:    #241e16;
+  --wood:    #2e2519;
+  --grain:   #3d3122;
+  --dust:    #7a6a52;
+  --straw:   #c4a96b;
+  --fleece:  #e8dcc8;
+  --cream:   #f5f0e8;
+  --grass:   #4a7c59;
+  --grass2:  #3d6649;
+  --sprout:  #7fb98a;
+  --copper:  #b8712a;
+  --rust:    #9e3d2a;
+  --sky:     #4a7fa5;
+  --border:  rgba(196,169,107,0.18);
+  --border2: rgba(196,169,107,0.08);
+  --rad:     6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--soil);
+  color: var(--fleece);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--bark);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-icon {
+  width: 28px; height: 28px;
+  background: var(--grass);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+.brand-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--straw);
+  letter-spacing: 0.04em;
+}
+.brand-sub {
+  font-size: 10px;
+  color: var(--dust);
+  margin-left: 2px;
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-icon {
+  background: var(--wood);
+  border: 1px solid var(--border);
+  border-radius: var(--rad);
+  color: var(--dust);
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-icon:hover { color: var(--straw); border-color: var(--straw); }
+
+/* ── NAV ── */
+.nav {
+  background: var(--bark);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav-btn {
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dust);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.nav-btn:hover { color: var(--fleece); }
+.nav-btn.active { color: var(--straw); border-bottom-color: var(--straw); }
+
+/* ── LAYOUT ── */
+.page { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
+.page.active { display: block; }
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dust);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.section-line {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0 18px;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--rad);
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--grass); color: #fff; }
+.btn-primary:hover { background: var(--grass2); }
+.btn-secondary { background: var(--wood); border: 1px solid var(--border); color: var(--fleece); }
+.btn-secondary:hover { border-color: var(--straw); color: var(--straw); }
+.btn-danger { background: rgba(158,61,42,0.2); border: 1px solid rgba(158,61,42,0.4); color: #e07060; }
+.btn-danger:hover { background: rgba(158,61,42,0.35); }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-copper { background: var(--copper); color: #fff; }
+.btn-copper:hover { background: #a06020; }
+
+/* ── KPI GRID ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.kpi {
+  background: var(--bark);
+  border: 1px solid var(--border);
+  border-radius: var(--rad);
+  padding: 14px 16px;
+}
+.kpi-label { font-size: 10px; color: var(--dust); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.kpi-value { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 500; }
+.kpi-sub { font-size: 10px; color: var(--dust); margin-top: 2px; }
+.c-grass { color: var(--sprout); }
+.c-straw { color: var(--straw); }
+.c-copper { color: var(--copper); }
+.c-rust { color: #e07060; }
+.c-sky { color: var(--sky); }
+
+/* ── CARD ── */
+.card {
+  background: var(--bark);
+  border: 1px solid var(--border);
+  border-radius: var(--rad);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.card-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dust);
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border2);
+}
+
+/* ── TABLE ── */
+.table-wrap {
+  background: var(--bark);
+  border: 1px solid var(--border);
+  border-radius: var(--rad);
+  overflow: auto;
+  margin-bottom: 16px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+thead th {
+  background: var(--wood);
+  color: var(--dust);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8px 12px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+tbody tr {
+  border-bottom: 1px solid var(--border2);
+  transition: background 0.1s;
+}
+tbody tr:hover { background: rgba(196,169,107,0.05); }
+tbody tr:last-child { border-bottom: none; }
+tbody td { padding: 8px 12px; vertical-align: middle; }
+.mono { font-family: 'DM Mono', monospace; }
+
+/* ── FORM ── */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dust);
+}
+input, select, textarea {
+  background: var(--wood);
+  border: 1px solid var(--border);
+  border-radius: var(--rad);
+  color: var(--fleece);
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--straw);
+}
+textarea { resize: vertical; min-height: 70px; }
+select option { background: var(--wood); }
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border2);
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,8,5,0.85);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bark);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title { font-size: 14px; font-weight: 600; color: var(--fleece); }
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--dust);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.modal-close:hover { color: var(--fleece); background: var(--wood); }
+.modal-body { padding: 20px; }
+
+/* ── BADGE ── */
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-family: 'DM Mono', monospace;
+}
+.badge-active  { background: rgba(74,124,89,0.25); color: var(--sprout); }
+.badge-sold    { background: rgba(74,127,165,0.25); color: var(--sky); }
+.badge-dead    { background: rgba(158,61,42,0.25); color: #e07060; }
+.badge-gone    { background: rgba(122,106,82,0.2); color: var(--dust); }
+.badge-abate   { background: rgba(184,113,42,0.25); color: var(--copper); }
+.badge-femea   { background: rgba(163,116,247,0.2); color: #b89af7; }
+.badge-macho   { background: rgba(74,127,165,0.2); color: var(--sky); }
+.badge-conf    { background: rgba(196,169,107,0.15); color: var(--straw); }
+
+/* ── PILL FILTERS ── */
+.filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--wood);
+  color: var(--dust);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pill:hover, .pill.active {
+  border-color: var(--straw);
+  color: var(--straw);
+  background: rgba(196,169,107,0.1);
+}
+
+/* ── SEARCH ── */
+.search-wrap {
+  position: relative;
+  margin-bottom: 12px;
+}
+.search-wrap input {
+  padding-left: 32px;
+}
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--dust);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+/* ── TIMELINE ── */
+.timeline { display: flex; flex-direction: column; gap: 8px; }
+.tl-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--wood);
+  border: 1px solid var(--border2);
+  border-radius: var(--rad);
+  font-size: 12px;
+}
+.tl-date { color: var(--dust); font-family: 'DM Mono', monospace; font-size: 11px; white-space: nowrap; min-width: 70px; }
+.tl-type { font-weight: 600; color: var(--straw); min-width: 70px; }
+.tl-desc { color: var(--fleece); flex: 1; }
+
+/* ── ALERT ── */
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--rad);
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.alert-info { background: rgba(74,127,165,0.15); border: 1px solid rgba(74,127,165,0.3); color: #8bbdd4; }
+.alert-warn { background: rgba(184,113,42,0.15); border: 1px solid rgba(184,113,42,0.3); color: var(--copper); }
+.alert-success { background: rgba(74,124,89,0.15); border: 1px solid rgba(74,124,89,0.3); color: var(--sprout); }
+
+/* ── DETAIL PANEL ── */
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.detail-item { }
+.detail-label { font-size: 10px; color: var(--dust); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+.detail-value { font-size: 13px; color: var(--fleece); font-family: 'DM Mono', monospace; }
+
+/* ── EMPTY STATE ── */
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--dust);
+}
+.empty-icon { font-size: 32px; margin-bottom: 10px; }
+.empty-text { font-size: 13px; }
+
+/* ── CHART ── */
+.mini-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 40px;
+}
+.mini-bar {
+  flex: 1;
+  background: var(--grass);
+  border-radius: 2px 2px 0 0;
+  min-height: 3px;
+  transition: background 0.15s;
+}
+.mini-bar:hover { background: var(--sprout); }
+
+/* ── WEIGHT CHART SVG ── */
+.chart-container {
+  background: var(--wood);
+  border: 1px solid var(--border2);
+  border-radius: var(--rad);
+  padding: 12px;
+  overflow: auto;
+}
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--grass);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: var(--rad);
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 999;
+  transform: translateY(60px);
+  opacity: 0;
+  transition: all 0.2s;
+  pointer-events: none;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.err { background: var(--rust); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .page { padding: 12px; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-grid, .form-grid-2 { grid-template-columns: 1fr; }
+  .detail-grid { grid-template-columns: repeat(2, 1fr); }
+  .modal { max-width: 100%; }
+}
+
+.row-link { cursor: pointer; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 4px; }
+.weight-spark { display: flex; align-items: flex-end; gap: 1px; height: 20px; }
+.ws-bar { width: 4px; background: var(--grass); border-radius: 1px; }
+
+/* ── PROGRESS ── */
+.progress-wrap { background: var(--wood); border-radius: 4px; height: 6px; overflow: hidden; margin-top: 6px; }
+.progress-bar { height: 100%; background: var(--grass); border-radius: 4px; transition: width 0.4s; }
+
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-icon">🐑</div>
+    <div>
+      <div class="brand-name">OVINOS <span class="brand-sub">· SC-27</span></div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-icon" onclick="exportData()">⬇ Exportar</button>
+    <button class="btn-icon" onclick="openImport()">⬆ Importar</button>
+    <button class="btn-icon" onclick="resetSistema()" style="background:rgba(158,61,42,0.3);color:#e07060;border-color:rgba(158,61,42,0.4)" title="Recarregar dados do sistema">↺ Reset</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="navTo('dashboard',this)">♂ Controle de Machos</button>
+  <button class="nav-btn" onclick="navTo('femeas',this)">♀ Controle Fêmeas</button>
+  <button class="nav-btn" onclick="navTo('pesagens',this)">⚖ Pesagens</button>
+  <button class="nav-btn" onclick="navTo('saude',this)">💉 Saúde</button>
+  <button class="nav-btn" onclick="navTo('manejo',this)">🏠 Manejo</button>
+  <button class="nav-btn" onclick="navTo('confinamentos',this)">📦 Confinamentos</button>
+</nav>
+
+<!-- ════════════════ DASHBOARD ════════════════ -->
+<div id="page-dashboard" class="page active">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Controle de Machos</div>
+      <div style="font-size:11px;color:var(--dust);margin-top:2px" id="dash-updated"></div>
+    </div>
+    <button class="btn btn-primary" onclick="navTo('animais',null);setTimeout(()=>openModal('modal-animal'),100)">+ Novo Macho</button>
+  </div>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px" class="dash-cols">
+
+    <div class="card">
+      <div class="card-title">Por Confinamento</div>
+      <div id="dash-conf-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Alertas & Próximos Eventos</div>
+      <div id="dash-alertas"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin:0" id="dash-tabela-titulo">Machos — Todos</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <select id="dash-filtro-sit" onchange="renderDashboard()" style="background:var(--wood);border:1px solid var(--border);border-radius:var(--rad);color:var(--fleece);padding:5px 8px;font-size:11px;font-family:DM Sans,sans-serif">
+          <option value="todos" selected>Todas situações</option>
+          <option value="ativo">Ativos</option>
+          <option value="abate">Abatidos (W)</option>
+          <option value="vendido">Vendidos</option>
+          <option value="morte">Mortos</option>
+          <option value="desaparecido">Desaparecidos</option>
+          <option value="renumerado">Renumerados</option>
+        </select>
+        <select id="dash-filtro-conf" onchange="renderDashboard()" style="background:var(--wood);border:1px solid var(--border);border-radius:var(--rad);color:var(--fleece);padding:5px 8px;font-size:11px;font-family:DM Sans,sans-serif">
+          <option value="todos">Todos confinamentos</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap" style="margin:0">
+      <table>
+        <thead><tr><th>Brinco</th><th>Nascimento</th><th>Mãe</th><th>Confinamento</th><th>Último Peso</th><th>Data</th><th>Peso Venda</th><th>Rend.%</th><th>Situação</th><th>Observações</th></tr></thead>
+        <tbody id="dash-pesagens"></tbody>
+      </table>
+    </div>
+    <div id="dash-rodape" style="font-size:11px;color:var(--dust);padding:8px 4px 0"></div>
+  </div>
+</div>
+
+<!-- ════════════════ ANIMAIS ════════════════ -->
+<div id="page-animais" class="page">
+  <div class="section-header">
+    <div class="section-title" style="display:none">Animais</div>
+    <button class="btn btn-primary" onclick="openModal('modal-animal')">+ Cadastrar</button>
+  </div>
+
+  <div class="filters" id="filtros-animal">
+    <span class="pill active" onclick="filterAnimais('todos',this)">Todos</span>
+    <span class="pill" onclick="filterAnimais('ativo',this)">Ativos</span>
+    <span class="pill" onclick="filterAnimais('macho',this)">Machos</span>
+    <span class="pill" onclick="filterAnimais('femea',this)">Fêmeas</span>
+    <span class="pill" onclick="filterAnimais('vendido',this)">Vendidos</span>
+    <span class="pill" onclick="filterAnimais('abate',this)">Abatidos</span>
+    <span class="pill" onclick="filterAnimais('morte',this)">Mortos</span>
+    <span class="pill" onclick="filterAnimais('renumerado',this)">↺ Renumerados</span>
+  </div>
+
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" placeholder="Buscar por brinco, mãe, raça..." id="search-animais" oninput="renderAnimais()">
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Brinco</th>
+          <th>Sexo</th>
+          <th>Nascimento</th>
+          <th>Mãe</th>
+          <th>Pai</th>
+          <th>Raça</th>
+          <th>Confinamento</th>
+          <th>Último Peso</th>
+          <th>Situação</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-animais"></tbody>
+    </table>
+  </div>
+</div>
+
+
+
+<!-- ════════════════ FÊMEAS ════════════════ -->
+<div id="page-femeas" class="page">
+  <div class="section-header">
+    <div class="section-title">Controle de Fêmeas — SC-10</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-secondary" onclick="openModal('modal-paricao')">+ Parição</button>
+      <button class="btn btn-primary" onclick="openModal('modal-animal');setTimeout(()=>document.getElementById('a-sexo').value='femea',100)">+ Cadastrar Fêmea</button>
+    </div>
+  </div>
+
+  <div class="kpi-grid" id="kpi-femeas"></div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin:0" id="femeas-tabela-titulo">Fêmeas — Todas</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <select id="fem-filtro-sit" onchange="renderFemeas()" style="background:var(--wood);border:1px solid var(--border);border-radius:var(--rad);color:var(--fleece);padding:5px 8px;font-size:11px;font-family:'DM Sans',sans-serif">
+          <option value="todas" selected>Todas</option>
+          <option value="vivas">Vivas</option>
+          <option value="mortas">Mortas</option>
+          <option value="par2025">Pariram 2025</option>
+          <option value="par2026">Pariram 2026</option>
+          <option value="vacinacl">Vacina CL ✓</option>
+          <option value="dectomax">Dectomax ✓</option>
+          <option value="semvacina">Sem Vacina CL</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="search-wrap" style="margin-bottom:10px">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Buscar por número, parição, observação..." id="search-femeas" oninput="renderFemeas()">
+    </div>
+
+    <div class="table-wrap" style="margin:0">
+      <table id="table-femeas">
+        <thead>
+          <tr>
+            <th style="min-width:55px">Nº</th>
+            <th style="min-width:90px">Nascimento</th>
+            <th style="min-width:90px">Morte</th>
+            <th style="min-width:200px">Parição 2025</th>
+            <th style="min-width:180px">Parição 2026</th>
+            <th style="text-align:center;min-width:55px">Vacina CL<br><span style="font-weight:400;color:var(--dust);font-size:9px">24/01/26</span></th>
+            <th style="text-align:center;min-width:55px">Dectomax<br><span style="font-weight:400;color:var(--dust);font-size:9px">06/05/26</span></th>
+            <th style="min-width:180px">Observação</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-femeas"></tbody>
+      </table>
+    </div>
+    <div id="femeas-rodape" style="font-size:11px;color:var(--dust);padding:8px 4px 0"></div>
+  </div>
+</div>
+
+<!-- ════════════════ PESAGENS ════════════════ -->
+<div id="page-pesagens" class="page">
+  <div class="section-header">
+    <div class="section-title">Pesagens</div>
+    <button class="btn btn-primary" onclick="openModal('modal-pesagem')">+ Registrar Pesagem</button>
+  </div>
+
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" placeholder="Buscar por brinco..." id="search-pesagens" oninput="renderPesagens()">
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Brinco</th><th>Data</th><th>Peso (kg)</th><th>GMD desde anterior</th><th>Observações</th><th>Ações</th></tr>
+      </thead>
+      <tbody id="tbody-pesagens"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════ SAÚDE ════════════════ -->
+<div id="page-saude" class="page">
+  <div class="section-header">
+    <div class="section-title">Saúde — Vacinas & Medicações</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-secondary" onclick="openModal('modal-vacina')">+ Vacina</button>
+      <button class="btn btn-primary" onclick="openModal('modal-med')">+ Medicação</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <span class="pill active" onclick="filterSaude('todos',this)">Todos</span>
+    <span class="pill" onclick="filterSaude('vacina',this)">Vacinas</span>
+    <span class="pill" onclick="filterSaude('medicacao',this)">Medicações</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Brinco</th><th>Tipo</th><th>Data</th><th>Produto</th><th>Dose / Via</th><th>Próxima Dose</th><th>Resp.</th><th>Obs.</th><th></th></tr>
+      </thead>
+      <tbody id="tbody-saude"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════ MANEJO ════════════════ -->
+<div id="page-manejo" class="page">
+  <div class="section-header">
+    <div class="section-title">Manejo</div>
+    <button class="btn btn-primary" onclick="openModal('modal-manejo')">+ Registrar Manejo</button>
+  </div>
+
+  <div class="filters">
+    <span class="pill active" onclick="filterManejo('todos',this)">Todos</span>
+    <span class="pill" onclick="filterManejo('maternidade',this)">Maternidade</span>
+    <span class="pill" onclick="filterManejo('desmame',this)">Desmame</span>
+    <span class="pill" onclick="filterManejo('tosquia',this)">Tosquia</span>
+    <span class="pill" onclick="filterManejo('casco',this)">Casco</span>
+    <span class="pill" onclick="filterManejo('vermifugo',this)">Vermífugo</span>
+    <span class="pill" onclick="filterManejo('outro',this)">Outro</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Brinco(s)</th><th>Tipo</th><th>Data</th><th>Detalhes</th><th>Responsável</th><th>Obs.</th><th></th></tr>
+      </thead>
+      <tbody id="tbody-manejo"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════ CONFINAMENTOS ════════════════ -->
+<div id="page-confinamentos" class="page">
+  <div class="section-header">
+    <div class="section-title">Confinamentos</div>
+    <button class="btn btn-primary" onclick="openModal('modal-conf')">+ Novo Confinamento</button>
+  </div>
+  <div id="conf-cards"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAIS
+════════════════════════════════════════════ -->
+
+<!-- MODAL: ANIMAL -->
+<div class="modal-overlay" id="modal-animal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-animal-title">Cadastrar Animal (M/F)</span>
+      <button class="modal-close" onclick="closeModal('modal-animal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="animal-id-edit">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nº Brinco *</label>
+          <input type="text" id="a-brinco" placeholder="ex: 208">
+        </div>
+        <div class="form-group">
+          <label>Sexo *</label>
+          <select id="a-sexo">
+            <option value="macho">Macho</option>
+            <option value="femea">Fêmea</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Data de Nascimento</label>
+          <input type="date" id="a-nasc">
+        </div>
+        <div class="form-group">
+          <label>Mãe (Brinco)</label>
+          <input type="text" id="a-mae" placeholder="ex: F062">
+        </div>
+        <div class="form-group">
+          <label>Pai (Brinco)</label>
+          <input type="text" id="a-pai" placeholder="ex: R001">
+        </div>
+        <div class="form-group">
+          <label>Raça</label>
+          <input type="text" id="a-raca" placeholder="ex: Dorper, Santa Inês">
+        </div>
+        <div class="form-group">
+          <label>Confinamento Atual</label>
+          <select id="a-conf">
+            <option value="">— Nenhum —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Situação</label>
+          <select id="a-situacao">
+            <option value="ativo">Ativo</option>
+            <option value="vendido">Vendido</option>
+            <option value="abate">Abatido (W)</option>
+            <option value="morte">Morte</option>
+            <option value="desaparecido">Desaparecido</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Peso Entrada (kg)</label>
+          <input type="number" step="0.01" id="a-peso-entrada" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>Peso Venda (kg)</label>
+          <input type="number" step="0.01" id="a-peso-venda" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>Rendimento Carcaça (%)</label>
+          <input type="number" step="0.01" id="a-rend" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>Brinco Anterior</label>
+          <input type="text" id="a-brinco-ant" placeholder="se houve troca">
+        </div>
+        <div class="form-group full">
+          <label>Observações</label>
+          <textarea id="a-obs" placeholder="Anotações gerais..."></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('modal-animal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveAnimal()">Salvar Animal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PESAGEM -->
+<div class="modal-overlay" id="modal-pesagem">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Registrar Pesagem</span>
+      <button class="modal-close" onclick="closeModal('modal-pesagem')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info">Registre o peso de um ou vários animais na mesma data.</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Data *</label>
+          <input type="date" id="p-data">
+        </div>
+        <div class="form-group">
+          <label>Brinco (M ou F) *</label>
+          <select id="p-animal">
+            <option value="">Selecionar...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Peso (kg) *</label>
+          <input type="number" step="0.01" id="p-peso" placeholder="0.00">
+        </div>
+        <div class="form-group full">
+          <label>Observações</label>
+          <input type="text" id="p-obs" placeholder="Opcional">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('modal-pesagem')">Cancelar</button>
+        <button class="btn btn-primary" onclick="savePesagem()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: VACINA -->
+<div class="modal-overlay" id="modal-vacina">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Registrar Vacinação</span>
+      <button class="modal-close" onclick="closeModal('modal-vacina')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Brinco(s) ex: M208 ou F062 *</label>
+          <input type="text" id="v-animal" placeholder="ex: 208 ou 208,209,210">
+        </div>
+        <div class="form-group">
+          <label>Data *</label>
+          <input type="date" id="v-data">
+        </div>
+        <div class="form-group">
+          <label>Vacina / Produto *</label>
+          <input type="text" id="v-produto" placeholder="ex: Clostridiose, Aftosa">
+        </div>
+        <div class="form-group">
+          <label>Dose</label>
+          <input type="text" id="v-dose" placeholder="ex: 2ml">
+        </div>
+        <div class="form-group">
+          <label>Via</label>
+          <select id="v-via">
+            <option value="SC">SC — Subcutânea</option>
+            <option value="IM">IM — Intramuscular</option>
+            <option value="IV">IV — Intravenosa</option>
+            <option value="VO">VO — Via Oral</option>
+            <option value="Tópico">Tópico</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Próxima Dose</label>
+          <input type="date" id="v-proxima">
+        </div>
+        <div class="form-group">
+          <label>Responsável</label>
+          <input type="text" id="v-resp" placeholder="Nome">
+        </div>
+        <div class="form-group full">
+          <label>Observações</label>
+          <input type="text" id="v-obs" placeholder="Opcional">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('modal-vacina')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveVacina()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: MEDICAÇÃO -->
+<div class="modal-overlay" id="modal-med">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Registrar Medicação</span>
+      <button class="modal-close" onclick="closeModal('modal-med')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Brinco(s) ex: M208 ou F062 *</label>
+          <input type="text" id="m-animal" placeholder="ex: 208 ou 208,209">
+        </div>
+        <div class="form-group">
+          <label>Data *</label>
+          <input type="date" id="m-data">
+        </div>
+        <div class="form-group">
+          <label>Medicamento *</label>
+          <input type="text" id="m-produto" placeholder="ex: Ivermectina, Oxitetraciclina">
+        </div>
+        <div class="form-group">
+          <label>Dose</label>
+          <input type="text" id="m-dose" placeholder="ex: 1ml/10kg">
+        </div>
+        <div class="form-group">
+          <label>Via</label>
+          <select id="m-via">
+            <option value="SC">SC</option>
+            <option value="IM">IM</option>
+            <option value="IV">IV</option>
+            <option value="VO">VO</option>
+            <option value="Tópico">Tópico</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Motivo</label>
+          <input type="text" id="m-motivo" placeholder="ex: Verminose, Pneumonia">
+        </div>
+        <div class="form-group">
+          <label>Próxima Dose</label>
+          <input type="date" id="m-proxima">
+        </div>
+        <div class="form-group">
+          <label>Responsável</label>
+          <input type="text" id="m-resp" placeholder="Nome">
+        </div>
+        <div class="form-group full">
+          <label>Observações</label>
+          <input type="text" id="m-obs" placeholder="Opcional">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('modal-med')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveMed()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: MANEJO -->
+<div class="modal-overlay" id="modal-manejo">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Registrar Manejo</span>
+      <button class="modal-close" onclick="closeModal('modal-manejo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Brinco(s) ex: M208 ou F062 *</label>
+          <input type="text" id="mj-animal" placeholder="ex: 208 ou lote 05">
+        </div>
+        <div class="form-group">
+          <label>Tipo *</label>
+          <select id="mj-tipo">
+            <option value="maternidade">Maternidade</option>
+            <option value="desmame">Desmame</option>
+            <option value="tosquia">Tosquia</option>
+            <option value="casco">Casqueamento</option>
+            <option value="vermifugo">Vermifugação</option>
+            <option value="pesagem_lote">Pesagem de lote</option>
+            <option value="transferencia">Transferência de baia</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Data *</label>
+          <input type="date" id="mj-data">
+        </div>
+        <div class="form-group">
+          <label>Responsável</label>
+          <input type="text" id="mj-resp" placeholder="Nome">
+        </div>
+        <div class="form-group full">
+          <label>Detalhes</label>
+          <textarea id="mj-detalhe" placeholder="Descrição do manejo realizado..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Observações</label>
+          <input type="text" id="mj-obs" placeholder="Opcional">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('modal-manejo')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveManejo()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFINAMENTO -->
+<div class="modal-overlay" id="modal-conf">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-conf-title">Novo Confinamento</span>
+      <button class="modal-close" onclick="closeModal('modal-conf')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="conf-id-edit">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nome / Código *</label>
+          <input type="text" id="cf-nome" placeholder="ex: CONF 07">
+        </div>
+        <div class="form-group">
+          <label>Data Início</label>
+          <input type="date" id="cf-inicio">
+        </div>
+        <div class="form-group">
+          <label>Data Fim (prevista)</label>
+          <input type="date" id="cf-fim">
+        </div>
+        <div class="form-group">
+          <label>Baia / Localização</label>
+          <input type="text" id="cf-local" placeholder="ex: Baia 3, Galpão Norte">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="cf-status">
+            <option value="ativo">Em andamento</option>
+            <option value="concluido">Concluído</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Observações</label>
+          <textarea id="cf-obs" placeholder="Tipo de dieta, objetivo, etc."></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('modal-conf')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveConf()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL: PARIÇÃO -->
+<div class="modal-overlay" id="modal-paricao">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Registrar Parição</span>
+      <button class="modal-close" onclick="closeModal('modal-paricao')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Mãe (Brinco) *</label>
+          <select id="par-mae"><option value="">Selecionar...</option></select>
+        </div>
+        <div class="form-group">
+          <label>Data da Parição *</label>
+          <input type="date" id="par-data">
+        </div>
+        <div class="form-group">
+          <label>Qtd Machos Nascidos</label>
+          <input type="number" min="0" id="par-machos" value="0">
+        </div>
+        <div class="form-group">
+          <label>Qtd Fêmeas Nascidas</label>
+          <input type="number" min="0" id="par-femeas" value="0">
+        </div>
+        <div class="form-group">
+          <label>Brincos dos filhos</label>
+          <input type="text" id="par-filhos" placeholder="ex: M255, F253">
+        </div>
+        <div class="form-group">
+          <label>Pai (Brinco)</label>
+          <input type="text" id="par-pai" placeholder="ex: M100">
+        </div>
+        <div class="form-group full">
+          <label>Observações</label>
+          <textarea id="par-obs" placeholder="ex: parto normal, gemelar, abandono..."></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('modal-paricao')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveParicao()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: IMPORT -->
+<div class="modal-overlay" id="modal-import">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Importar Dados (JSON)</span>
+      <button class="modal-close" onclick="closeModal('modal-import')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-warn">⚠ Importar substituirá todos os dados atuais. Exporte primeiro se quiser backup.</div>
+      <div class="form-group">
+        <label>Cole o JSON exportado:</label>
+        <textarea id="import-json" style="min-height:120px;font-family:'DM Mono',monospace;font-size:11px" placeholder='{"animais":[],"pesagens":[],...}'></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('modal-import')">Cancelar</button>
+        <button class="btn btn-danger" onclick="importData()">Importar e Substituir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DETALHE ANIMAL -->
+<div class="modal-overlay" id="modal-detalhe">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <span class="modal-title" id="detalhe-title">Animal</span>
+      <button class="modal-close" onclick="closeModal('modal-detalhe')">✕</button>
+    </div>
+    <div class="modal-body" id="modal-detalhe-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://bfazyzpwhtxwdvbiwdth.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_IiDCWIRTbM6kTllotgVu6Q_tjA_urBN';
+const SEED_VERSION = 6;
+const seed = {"animais":[{"_id":"M208","id":"M208","sexo":"macho","nasc":"2025-09-14","mae":"F062","pai":"","raca":"","conf":"C03","situacao":"abate","pesoEntrada":24.6,"pesoVenda":34,"rend":46.47,"brincoAnt":"","obs":"(W) 23/01/26","_ts":1781742430351},{"_id":"M209","id":"M209","sexo":"macho","nasc":"2025-08-26","mae":"F096","pai":"","raca":"","conf":"","situacao":"vendido","pesoEntrada":20.9,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Saiu 04/02/26","_ts":1781742430351},{"_id":"M210","id":"M210","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C04","situacao":"vendido","pesoEntrada":24.7,"pesoVenda":33.25,"rend":null,"brincoAnt":"","obs":"Ir Ant. M. Lopes 24/03/26","_ts":1781742430351},{"_id":"M211","id":"M211","sexo":"macho","nasc":"2025-09-15","mae":"F094","pai":"","raca":"","conf":"C04","situacao":"vendido","pesoEntrada":18.55,"pesoVenda":31.25,"rend":null,"brincoAnt":"","obs":"(O) 03/04/2026","_ts":1781742430351},{"_id":"M212","id":"M212","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C03","situacao":"vendido","pesoEntrada":24.8,"pesoVenda":31.45,"rend":null,"brincoAnt":"","obs":"(O) 26/01/26","_ts":1781742430351},{"_id":"M213","id":"M213","sexo":"macho","nasc":"2025-09-09","mae":"F117","pai":"","raca":"","conf":"C03","situacao":"vendido","pesoEntrada":23.7,"pesoVenda":29.8,"rend":null,"brincoAnt":"","obs":"(O) 24/01/26","_ts":1781742430351},{"_id":"M214","id":"M214","sexo":"macho","nasc":"2025-08-22","mae":"F118","pai":"","raca":"","conf":"C03","situacao":"abate","pesoEntrada":23.95,"pesoVenda":30.2,"rend":43.54,"brincoAnt":"","obs":"(W) 23/01/26","_ts":1781742430351},{"_id":"M215","id":"M215","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"","situacao":"vendido","pesoEntrada":22.2,"pesoVenda":25,"rend":null,"brincoAnt":"","obs":"Isac de Henrique 06/01/26","_ts":1781742430351},{"_id":"M216","id":"M216","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"","situacao":"renumerado","pesoEntrada":15.5,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Brinco trocado para M251","_ts":1781742430351},{"_id":"M217","id":"M217","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C03","situacao":"vendido","pesoEntrada":27.1,"pesoVenda":31.6,"rend":null,"brincoAnt":"","obs":"(O) 26/01/26","_ts":1781742430351},{"_id":"M218","id":"M218","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C01","situacao":"abate","pesoEntrada":26.65,"pesoVenda":38.55,"rend":47.6,"brincoAnt":"","obs":"(W) 02/10/25","_ts":1781742430351},{"_id":"M219","id":"M219","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C01","situacao":"abate","pesoEntrada":28.25,"pesoVenda":40.5,"rend":43.21,"brincoAnt":"","obs":"(W) 02/10/25","_ts":1781742430351},{"_id":"M220","id":"M220","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C01","situacao":"abate","pesoEntrada":30.4,"pesoVenda":42.8,"rend":46.03,"brincoAnt":"","obs":"(W) 02/10/25","_ts":1781742430351},{"_id":"M221","id":"M221","sexo":"macho","nasc":"2025-07-19","mae":"F188","pai":"","raca":"","conf":"C03","situacao":"abate","pesoEntrada":26.85,"pesoVenda":31.2,"rend":46.31,"brincoAnt":"","obs":"(W) 23/01/26","_ts":1781742430351},{"_id":"M222","id":"M222","sexo":"macho","nasc":"2025-10-30","mae":"F119","pai":"","raca":"","conf":"","situacao":"renumerado","pesoEntrada":11.4,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Brinco trocado para M254","_ts":1781742430351},{"_id":"M223","id":"M223","sexo":"macho","nasc":"2025-10-14","mae":"F124","pai":"","raca":"","conf":"C04","situacao":"morte","pesoEntrada":11.1,"pesoVenda":32.65,"rend":null,"brincoAnt":"","obs":"(M) Morte 19/05/26","_ts":1781742430351},{"_id":"M224","id":"M224","sexo":"macho","nasc":"2025-10-31","mae":"F189","pai":"","raca":"","conf":"C04","situacao":"morte","pesoEntrada":11.2,"pesoVenda":33.75,"rend":null,"brincoAnt":"","obs":"(M) Morte 19/05/26","_ts":1781742430351},{"_id":"M225","id":"M225","sexo":"macho","nasc":"2025-12-16","mae":"F201","pai":"","raca":"","conf":"C06","situacao":"ativo","pesoEntrada":21.6,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M226","id":"M226","sexo":"macho","nasc":"2025-12-15","mae":"F227","pai":"","raca":"","conf":"","situacao":"vendido","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Saiu 02/01/26","_ts":1781742430351},{"_id":"M227","id":"M227","sexo":"macho","nasc":"2025-12-18","mae":"F029","pai":"","raca":"","conf":"C04","situacao":"morte","pesoEntrada":21.95,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"MORTE por cachorro 23/04/26","_ts":1781742430351},{"_id":"M228","id":"M228","sexo":"macho","nasc":"2025-12-16","mae":"F169","pai":"","raca":"","conf":"","situacao":"renumerado","pesoEntrada":23.4,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Brinco trocado para M253","_ts":1781742430351},{"_id":"M229","id":"M229","sexo":"macho","nasc":"2025-12-07","mae":"F144","pai":"","raca":"","conf":"C06","situacao":"ativo","pesoEntrada":17.45,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M230","id":"M230","sexo":"macho","nasc":"2025-12-09","mae":"F137","pai":"","raca":"","conf":"C06","situacao":"ativo","pesoEntrada":17.25,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M231","id":"M231","sexo":"macho","nasc":"2025-12-19","mae":"F203","pai":"","raca":"","conf":"C06","situacao":"ativo","pesoEntrada":20.6,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M232","id":"M232","sexo":"macho","nasc":"2025-12-06","mae":"F204","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":18.9,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M233","id":"M233","sexo":"macho","nasc":"2025-10-16","mae":"F209","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":11.6,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M234","id":"M234","sexo":"macho","nasc":"2025-12-15","mae":"F229","pai":"","raca":"","conf":"C04","situacao":"morte","pesoEntrada":24.4,"pesoVenda":37.85,"rend":null,"brincoAnt":"","obs":"(M) Morte 19/05/26","_ts":1781742430351},{"_id":"M235","id":"M235","sexo":"macho","nasc":"2025-12-24","mae":"F059","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":17.3,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M236","id":"M236","sexo":"macho","nasc":"2025-12-04","mae":"F067","pai":"","raca":"","conf":"C06","situacao":"ativo","pesoEntrada":18.3,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M237","id":"M237","sexo":"macho","nasc":"2025-12-08","mae":"F136","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":14.75,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M238","id":"M238","sexo":"macho","nasc":"2025-12-28","mae":"F207","pai":"","raca":"","conf":"","situacao":"desaparecido","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Desaparecido 22/03/26","_ts":1781742430351},{"_id":"M239","id":"M239","sexo":"macho","nasc":"2025-12-22","mae":"F115","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":19.7,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M240","id":"M240","sexo":"macho","nasc":"2025-12-22","mae":"F053","pai":"","raca":"","conf":"","situacao":"desaparecido","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Desaparecido 22/03/26","_ts":1781742430351},{"_id":"M241","id":"M241","sexo":"macho","nasc":"2025-12-06","mae":"F204","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":14.9,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M242","id":"M242","sexo":"macho","nasc":"2026-01-06","mae":"F047","pai":"","raca":"","conf":"C04","situacao":"vendido","pesoEntrada":21.45,"pesoVenda":32.3,"rend":null,"brincoAnt":"","obs":"Vendido 07/06/2026","_ts":1781742430351},{"_id":"M243","id":"M243","sexo":"macho","nasc":"2026-01-06","mae":"F101","pai":"","raca":"","conf":"C04","situacao":"renumerado","pesoEntrada":10.6,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Brinco trocado para M256","_ts":1781742430351},{"_id":"M244","id":"M244","sexo":"macho","nasc":"2026-01-09","mae":"F167","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":20.1,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M245","id":"M245","sexo":"macho","nasc":"2026-01-10","mae":"F168","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":10.15,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M246","id":"M246","sexo":"macho","nasc":"2026-01-23","mae":"F027","pai":"","raca":"","conf":"","situacao":"vendido","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Saiu 10/02/26","_ts":1781742430351},{"_id":"M247","id":"M247","sexo":"macho","nasc":"2026-01-23","mae":"F240","pai":"","raca":"","conf":"C04","situacao":"vendido","pesoEntrada":15.3,"pesoVenda":28.9,"rend":null,"brincoAnt":"","obs":"Vendido a Antonio","_ts":1781742430351},{"_id":"M248","id":"M248","sexo":"macho","nasc":"2026-02-02","mae":"F054","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":15.8,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M249","id":"M249","sexo":"macho","nasc":"2026-02-06","mae":"F192","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":16.75,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M250","id":"M250","sexo":"macho","nasc":"2026-03-21","mae":"F069","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":6.3,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M251","id":"M251","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":15.5,"pesoVenda":null,"rend":null,"brincoAnt":"M216","obs":"Mamadeira — era 216","_ts":1781742430351},{"_id":"M252","id":"M252","sexo":"macho","nasc":"2026-03-25","mae":"F063","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":4.05,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742430351},{"_id":"M253","id":"M253","sexo":"macho","nasc":"2025-12-16","mae":"F169","pai":"","raca":"","conf":"C04","situacao":"vendido","pesoEntrada":23.4,"pesoVenda":null,"rend":null,"brincoAnt":"M228","obs":"Vendido 30/05/26 — era 228","_ts":1781742430351},{"_id":"M254","id":"M254","sexo":"macho","nasc":"2025-10-30","mae":"F119","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":11.4,"pesoVenda":null,"rend":null,"brincoAnt":"M222","obs":"era 222","_ts":1781742430351},{"_id":"M255","id":"M255","sexo":"macho","nasc":"2026-06-10","mae":"F243","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Nascido 10/06/26","_ts":1781742430351},{"_id":"M256","id":"M256","sexo":"macho","nasc":"2026-01-06","mae":"F101","pai":"","raca":"","conf":"C05","situacao":"ativo","pesoEntrada":10.6,"pesoVenda":null,"rend":null,"brincoAnt":"M243","obs":"era 243","_ts":1781742430351},{"_id":"M257","id":"M257","sexo":"macho","nasc":"2026-06-12","mae":"F209","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Nascido 12/06/26","_ts":1781742430351},{"_id":"M281","id":"M281","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":21.25,"pesoVenda":38.65,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M282","id":"M282","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":21.26,"pesoVenda":43.9,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M283","id":"M283","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":21.27,"pesoVenda":36.45,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M284","id":"M284","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":21.28,"pesoVenda":38.8,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M285","id":"M285","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":21.3,"pesoVenda":40,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M286","id":"M286","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":20.45,"pesoVenda":38.4,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M287","id":"M287","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":22.4,"pesoVenda":37.45,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M288","id":"M288","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":18.9,"pesoVenda":36.85,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M289","id":"M289","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":24.45,"pesoVenda":44.45,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M290","id":"M290","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":23.1,"pesoVenda":39.55,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M291","id":"M291","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":25.4,"pesoVenda":42.1,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M292","id":"M292","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":18.5,"pesoVenda":38.3,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M293","id":"M293","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":21.1,"pesoVenda":38.6,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M294","id":"M294","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":23,"pesoVenda":44.8,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M295","id":"M295","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":24.6,"pesoVenda":44.7,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M296","id":"M296","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":28.2,"pesoVenda":48.4,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"M297","id":"M297","sexo":"macho","nasc":"","mae":"","pai":"","raca":"","conf":"C02","situacao":"vendido","pesoEntrada":26,"pesoVenda":48.1,"rend":null,"brincoAnt":"","obs":"CONF 02","_ts":1781742430351},{"_id":"F022","id":"F022","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357626},{"_id":"F023","id":"F023","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 09/08/2025 (F191)","_ts":1781742357626},{"_id":"F024","id":"F024","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357626},{"_id":"F025","id":"F025","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 01/06/2025","_ts":1781742357626},{"_id":"F026","id":"F026","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F027","id":"F027","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 30/12/2024 (F152); 23/01/2026 (M246/F238). 14/07/2025 abandono e morte dos filhotes","_ts":1781742357627},{"_id":"F028","id":"F028","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 12/08/2023 (F073); 20/05/2025 (F151); 06/12/2025 (M+F212). 01 borrego macho morreu 13/12/2025","_ts":1781742357627},{"_id":"F029","id":"F029","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 03/06/2025 (M+F176); 18/12/2025 (M227)","_ts":1781742357627},{"_id":"F030","id":"F030","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F031","id":"F031","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 05/05/2025 (M); 07/12/2025 (F213)","_ts":1781742357627},{"_id":"F032","id":"F032","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 17/06/2025 (M)","_ts":1781742357627},{"_id":"F033","id":"F033","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 31/05/2025 (F157); 12/01/2026 (F235)","_ts":1781742357627},{"_id":"F034","id":"F034","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 10/06/2025 (M); 25/12/2025 (F226)","_ts":1781742357627},{"_id":"F036","id":"F036","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 17/06/2025 (F180)","_ts":1781742357627},{"_id":"F037","id":"F037","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 20/07/2025 (F190)","_ts":1781742357627},{"_id":"F038","id":"F038","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F039","id":"F039","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 26/06/2025 (M+F173)","_ts":1781742357627},{"_id":"F040","id":"F040","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F041","id":"F041","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 18/06/2025 (M)","_ts":1781742357627},{"_id":"F043","id":"F043","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F044","id":"F044","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 11/09/2025 (F196)","_ts":1781742357627},{"_id":"F045","id":"F045","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F046","id":"F046","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 18/05/2025 (F154)","_ts":1781742357627},{"_id":"F047","id":"F047","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"249","obs":"Pariu 30/06/2025 (F170); 06/01/2026 (M242). TROCOU BRINCO PARA 249 em 31/03/2026","_ts":1781742357627},{"_id":"F048","id":"F048","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"236","obs":"TROCOU BRINCO PARA 236 em 12/01/2026","_ts":1781742357627},{"_id":"F049","id":"F049","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F050","id":"F050","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 03/07/2025 (F185)","_ts":1781742357627},{"_id":"F052","id":"F052","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"CEGO. Pariu 28/06/2025 (M)","_ts":1781742357627},{"_id":"F053","id":"F053","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"248","obs":"Pariu 19/05/2025 (M); 22/12/2025 (M240). TROCOU BRINCO PARA 248 em 24/01/2026","_ts":1781742357627},{"_id":"F054","id":"F054","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 09/06/2025 (F177); 02/02/2026 (M248)","_ts":1781742357627},{"_id":"F055","id":"F055","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 09/09/2025 (F195)","_ts":1781742357627},{"_id":"F056","id":"F056","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F058","id":"F058","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F059","id":"F059","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 17/06/2025 (F178); 24/12/2025 (M235)","_ts":1781742357627},{"_id":"F060","id":"F060","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F061","id":"F061","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 21/01/2025 (M)","_ts":1781742357627},{"_id":"F062","id":"F062","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 14/09/2025 (M208)","_ts":1781742357627},{"_id":"F063","id":"F063","sexo":"femea","nasc":"2020-05-01","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"BOA DE LEITE. Pariu 25/03/2026 (M252/F250)","_ts":1781742357627},{"_id":"F064","id":"F064","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F065","id":"F065","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 10/06/2025 (M)","_ts":1781742357627},{"_id":"F066","id":"F066","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 07/06/2025 (F175)","_ts":1781742357627},{"_id":"F067","id":"F067","sexo":"femea","nasc":"2020-05-01","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"V CHITADA. Pariu 04/12/2025 (M236+F211)","_ts":1781742357627},{"_id":"F068","id":"F068","sexo":"femea","nasc":"2020-05-01","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F069","id":"F069","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 21/03/2026 (M250)","_ts":1781742357627},{"_id":"F070","id":"F070","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F071","id":"F071","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F072","id":"F072","sexo":"femea","nasc":"2020-05-01","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F073","id":"F073","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"F028","_ts":1781742357627},{"_id":"F074","id":"F074","sexo":"femea","nasc":"2020-05-01","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F075","id":"F075","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F076","id":"F076","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F077","id":"F077","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 30/08/2025 (M)","_ts":1781742357627},{"_id":"F078","id":"F078","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F079","id":"F079","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 02/10/2025 (M)","_ts":1781742357627},{"_id":"F080","id":"F080","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F081","id":"F081","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"MORTE DE UM MACHO POR INTOXICAÇÃO COM UREIA","_ts":1781742357627},{"_id":"F082","id":"F082","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 17/07/2025 (M)","_ts":1781742357627},{"_id":"F083","id":"F083","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 15/06/2025 (F172)","_ts":1781742357627},{"_id":"F084","id":"F084","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F085","id":"F085","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 03/07/2025 (M); 23/01/2026 (F239)","_ts":1781742357627},{"_id":"F086","id":"F086","sexo":"femea","nasc":"2023-12-17","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F087","id":"F087","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F088","id":"F088","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 02/09/2025 (F194)","_ts":1781742357627},{"_id":"F089","id":"F089","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 14/06/2025 (F182)","_ts":1781742357627},{"_id":"F090","id":"F090","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 21/08/2025 (F193); 13/06/2026 (F255)","_ts":1781742357627},{"_id":"F091","id":"F091","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F092","id":"F092","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F093","id":"F093","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 03/10/2025 (F208). Saiu da maternidade em 23/10/2025","_ts":1781742357627},{"_id":"F094","id":"F094","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 15/09/2025 (M211)","_ts":1781742357627},{"_id":"F095","id":"F095","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 24/08/2025 (M)","_ts":1781742357627},{"_id":"F096","id":"F096","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 26/08/2025 (M209)","_ts":1781742357627},{"_id":"F097","id":"F097","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F098","id":"F098","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 06/01/2026 (F233)","_ts":1781742357627},{"_id":"F099","id":"F099","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 18/06/2025 (F183); 22/12/2025 (M)","_ts":1781742357627},{"_id":"F100","id":"F100","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F101","id":"F101","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 14/06/2025 (F171); 06/01/2026 (M243+F234)","_ts":1781742357627},{"_id":"F102","id":"F102","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 07/05/2025 (F153). ABORTO EM 27/11/2025","_ts":1781742357627},{"_id":"F103","id":"F103","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 19/05/2025 (M+F163); 20/05/2026 (2F-251/252)","_ts":1781742357627},{"_id":"F104","id":"F104","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F105","id":"F105","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F106","id":"F106","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 08/07/2025 (F186); 11/06/2026 (F254)","_ts":1781742357627},{"_id":"F108","id":"F108","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 26/05/2025 (M+F159); 09/12/2025 (M). 19/12/2025 morte do filhote","_ts":1781742357627},{"_id":"F109","id":"F109","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 01/05/2025 (F150); 01/12/2025 (F210)","_ts":1781742357627},{"_id":"F110","id":"F110","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 05/06/2025 (F179); 03/01/2026 (F232)","_ts":1781742357627},{"_id":"F111","id":"F111","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F112","id":"F112","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F113","id":"F113","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F114","id":"F114","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 23/06/2025 (M); 28/12/2025 (F228)","_ts":1781742357627},{"_id":"F115","id":"F115","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 22/12/2025 (M239)","_ts":1781742357627},{"_id":"F116","id":"F116","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F117","id":"F117","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 09/09/2025 (M213). Pariu 1 fêmea junto c/ macho, fêmea foi injetada e morreu","_ts":1781742357627},{"_id":"F118","id":"F118","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 22/08/2025 (M214)","_ts":1781742357627},{"_id":"F119","id":"F119","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 30/10/2025 (M222)","_ts":1781742357627},{"_id":"F120","id":"F120","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F121","id":"F121","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 07/06/2025 (M); 16/12/2025 (F218)","_ts":1781742357627},{"_id":"F122","id":"F122","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"209","obs":"TROCOU BRINCO PARA 209 em 14/10/2025","_ts":1781742357627},{"_id":"F123","id":"F123","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F124","id":"F124","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 14/10/2025 (M223)","_ts":1781742357627},{"_id":"F125","id":"F125","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F126","id":"F126","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 12/12/2025 (F216)","_ts":1781742357627},{"_id":"F127","id":"F127","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F128","id":"F128","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F129","id":"F129","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F130","id":"F130","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F131","id":"F131","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F132","id":"F132","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F133","id":"F133","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F134","id":"F134","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 14/12/2025 (F217)","_ts":1781742357627},{"_id":"F135","id":"F135","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 15/06/2026 (F257)","_ts":1781742357627},{"_id":"F136","id":"F136","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 08/12/2025 (M237)","_ts":1781742357627},{"_id":"F137","id":"F137","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 09/12/2025 (M230)","_ts":1781742357627},{"_id":"F138","id":"F138","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F139","id":"F139","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"MORTE DE UM MACHO POR INTOXICAÇÃO COM UREIA","_ts":1781742357627},{"_id":"F140","id":"F140","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F141","id":"F141","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 26/09/2025 (F197)","_ts":1781742357627},{"_id":"F142","id":"F142","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F143","id":"F143","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 22/06/2025 (F181); 24/12/2025 (F225)","_ts":1781742357627},{"_id":"F144","id":"F144","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 22/05/2025 (F161); 07/12/2025 (M229)","_ts":1781742357627},{"_id":"F145","id":"F145","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 11/05/2025 (F160); 08/12/2025 (F214)","_ts":1781742357627},{"_id":"F146","id":"F146","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 25/05/2025 (M); 10/12/2025 (F215)","_ts":1781742357627},{"_id":"F147","id":"F147","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 28/06/2025 (F174)","_ts":1781742357627},{"_id":"F148","id":"F148","sexo":"femea","nasc":"2024-12-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 29/06/2025 (M); 31/12/2025 (F230)","_ts":1781742357627},{"_id":"F150","id":"F150","sexo":"femea","nasc":"2025-05-01","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F109","_ts":1781742357627},{"_id":"F151","id":"F151","sexo":"femea","nasc":"2025-05-20","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F028","_ts":1781742357627},{"_id":"F152","id":"F152","sexo":"femea","nasc":"2024-12-30","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F027","_ts":1781742357627},{"_id":"F153","id":"F153","sexo":"femea","nasc":"2025-05-07","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F102","_ts":1781742357627},{"_id":"F154","id":"F154","sexo":"femea","nasc":"2025-05-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F046","_ts":1781742357627},{"_id":"F155","id":"F155","sexo":"femea","nasc":"2025-05-11","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F156","id":"F156","sexo":"femea","nasc":"2025-05-11","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F203","_ts":1781742357627},{"_id":"F157","id":"F157","sexo":"femea","nasc":"2025-05-31","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F033","_ts":1781742357627},{"_id":"F158","id":"F158","sexo":"femea","nasc":"2025-06-01","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F169","_ts":1781742357627},{"_id":"F159","id":"F159","sexo":"femea","nasc":"2025-05-26","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F108","_ts":1781742357627},{"_id":"F160","id":"F160","sexo":"femea","nasc":"2025-05-11","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F145","_ts":1781742357627},{"_id":"F161","id":"F161","sexo":"femea","nasc":"2025-05-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F144","_ts":1781742357627},{"_id":"F162","id":"F162","sexo":"femea","nasc":"2025-05-11","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357627},{"_id":"F163","id":"F163","sexo":"femea","nasc":"2025-05-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F103","_ts":1781742357627},{"_id":"F164","id":"F164","sexo":"femea","nasc":"2025-06-01","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F168","_ts":1781742357627},{"_id":"F165","id":"F165","sexo":"femea","nasc":"2025-05-16","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F207","_ts":1781742357627},{"_id":"F166","id":"F166","sexo":"femea","nasc":"2025-05-16","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F207","_ts":1781742357627},{"_id":"F167","id":"F167","sexo":"femea","nasc":"2025-06-01","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 09/01/2026 (M244)","_ts":1781742357627},{"_id":"F168","id":"F168","sexo":"femea","nasc":"2025-06-01","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 01/06/2025 (F164); 10/01/2026 (M245)","_ts":1781742357627},{"_id":"F169","id":"F169","sexo":"femea","nasc":"2025-06-01","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 01/06/2025 (F158); 16/12/2025 (M228)","_ts":1781742357627},{"_id":"F170","id":"F170","sexo":"femea","nasc":"2025-06-30","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F047","_ts":1781742357627},{"_id":"F171","id":"F171","sexo":"femea","nasc":"2025-06-14","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F101","_ts":1781742357627},{"_id":"F172","id":"F172","sexo":"femea","nasc":"2025-06-15","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F083","_ts":1781742357627},{"_id":"F173","id":"F173","sexo":"femea","nasc":"2025-06-26","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F039","_ts":1781742357627},{"_id":"F174","id":"F174","sexo":"femea","nasc":"2025-06-28","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F147","_ts":1781742357627},{"_id":"F175","id":"F175","sexo":"femea","nasc":"2025-06-07","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F066","_ts":1781742357627},{"_id":"F176","id":"F176","sexo":"femea","nasc":"2025-06-03","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F029","_ts":1781742357627},{"_id":"F177","id":"F177","sexo":"femea","nasc":"2025-06-09","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F054","_ts":1781742357627},{"_id":"F178","id":"F178","sexo":"femea","nasc":"2025-06-17","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F059","_ts":1781742357627},{"_id":"F179","id":"F179","sexo":"femea","nasc":"2025-06-05","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F110","_ts":1781742357627},{"_id":"F180","id":"F180","sexo":"femea","nasc":"2025-06-17","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F036","_ts":1781742357627},{"_id":"F181","id":"F181","sexo":"femea","nasc":"2025-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F143","_ts":1781742357627},{"_id":"F182","id":"F182","sexo":"femea","nasc":"2025-06-14","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F089","_ts":1781742357627},{"_id":"F183","id":"F183","sexo":"femea","nasc":"2025-06-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F099","_ts":1781742357627},{"_id":"F184","id":"F184","sexo":"femea","nasc":"","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"BRINCO EXTRAVIADO","_ts":1781742357627},{"_id":"F185","id":"F185","sexo":"femea","nasc":"2025-07-03","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F050","_ts":1781742357627},{"_id":"F186","id":"F186","sexo":"femea","nasc":"2025-07-08","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F106","_ts":1781742357627},{"_id":"F187","id":"F187","sexo":"femea","nasc":"2025-07-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F202","_ts":1781742357627},{"_id":"F188","id":"F188","sexo":"femea","nasc":"2025-07-19","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de M221. Comprada de Isac (CABELUDA)","_ts":1781742357627},{"_id":"F189","id":"F189","sexo":"femea","nasc":"2025-10-31","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de M224. Comprada de Isac (LISA)","_ts":1781742357627},{"_id":"F190","id":"F190","sexo":"femea","nasc":"2025-07-20","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F037","_ts":1781742357627},{"_id":"F191","id":"F191","sexo":"femea","nasc":"2025-08-09","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F023","_ts":1781742357627},{"_id":"F192","id":"F192","sexo":"femea","nasc":"2025-08-10","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 06/02/2026 (M249)","_ts":1781742357627},{"_id":"F193","id":"F193","sexo":"femea","nasc":"2025-08-21","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F090","_ts":1781742357627},{"_id":"F194","id":"F194","sexo":"femea","nasc":"2025-09-02","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F088. MORTE POR CACHORRO","_ts":1781742357627},{"_id":"F195","id":"F195","sexo":"femea","nasc":"2025-09-09","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F055","_ts":1781742357627},{"_id":"F196","id":"F196","sexo":"femea","nasc":"2025-09-11","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F044","_ts":1781742357627},{"_id":"F197","id":"F197","sexo":"femea","nasc":"2025-09-26","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F141","_ts":1781742357628},{"_id":"F201","id":"F201","sexo":"femea","nasc":"2025-12-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 16/12/2025 (M225)","_ts":1781742357628},{"_id":"F202","id":"F202","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 19/07/2025 (F187)","_ts":1781742357628},{"_id":"F203","id":"F203","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"SÓ TEM 01 PEITO FUNCIONANDO. Pariu 11/05/2025 (M+F156); 19/12/2025 (M231)","_ts":1781742357628},{"_id":"F204","id":"F204","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Pariu 04/06/2025 (M); 06/12/2025 (2M-232/241)","_ts":1781742357628},{"_id":"F205","id":"F205","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"","_ts":1781742357628},{"_id":"F207","id":"F207","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"244","obs":"Pariu 16/05/2025 (2F-165/166); 28/12/2025 (M238). TROCOU BRINCO PARA 244 em 24/01/2026","_ts":1781742357628},{"_id":"F208","id":"F208","sexo":"femea","nasc":"2025-10-03","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F093","_ts":1781742357628},{"_id":"F209","id":"F209","sexo":"femea","nasc":"2024-06-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"122","obs":"S. Pariu 16/10/2025 (M233); 12/06/2026 (M257). ANTES ERA 122","_ts":1781742357628},{"_id":"F210","id":"F210","sexo":"femea","nasc":"2025-12-01","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F109","_ts":1781742357628},{"_id":"F211","id":"F211","sexo":"femea","nasc":"2025-12-04","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F067. Chegou com falta de respiração no curral","_ts":1781742357628},{"_id":"F212","id":"F212","sexo":"femea","nasc":"2025-12-06","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F028","_ts":1781742357628},{"_id":"F213","id":"F213","sexo":"femea","nasc":"2025-12-07","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F031","_ts":1781742357628},{"_id":"F214","id":"F214","sexo":"femea","nasc":"2025-12-08","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F145","_ts":1781742357628},{"_id":"F215","id":"F215","sexo":"femea","nasc":"2025-12-10","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F146","_ts":1781742357628},{"_id":"F216","id":"F216","sexo":"femea","nasc":"2025-12-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F126. Pariu 12/12/2025 (M)","_ts":1781742357628},{"_id":"F217","id":"F217","sexo":"femea","nasc":"2025-12-14","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F134","_ts":1781742357628},{"_id":"F218","id":"F218","sexo":"femea","nasc":"2025-12-16","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F121","_ts":1781742357628},{"_id":"F219","id":"F219","sexo":"femea","nasc":"2025-12-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F220","_ts":1781742357628},{"_id":"F220","id":"F220","sexo":"femea","nasc":"2025-12-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 22/12/2025 (F219)","_ts":1781742357628},{"_id":"F221","id":"F221","sexo":"femea","nasc":"2025-12-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F231","_ts":1781742357628},{"_id":"F222","id":"F222","sexo":"femea","nasc":"2025-12-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 22/12/2025 (M)","_ts":1781742357628},{"_id":"F223","id":"F223","sexo":"femea","nasc":"2025-12-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"231","obs":"S. TROCOU BRINCO PARA 231 em 03/01/2026. Pariu 22/12/2025 (F221)","_ts":1781742357628},{"_id":"F224","id":"F224","sexo":"femea","nasc":"2025-12-22","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S.","_ts":1781742357628},{"_id":"F225","id":"F225","sexo":"femea","nasc":"2025-12-24","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F143","_ts":1781742357628},{"_id":"F226","id":"F226","sexo":"femea","nasc":"2025-12-25","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F034","_ts":1781742357628},{"_id":"F227","id":"F227","sexo":"femea","nasc":"2025-12-28","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 15/12/2025 (M226). TEM 01 BORREGO MACHO NO PÉ (morte filhote em 02/01/2026)","_ts":1781742357628},{"_id":"F228","id":"F228","sexo":"femea","nasc":"2025-12-28","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F228","_ts":1781742357628},{"_id":"F229","id":"F229","sexo":"femea","nasc":"2026-01-03","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 15/12/2025 (M234)","_ts":1781742357628},{"_id":"F230","id":"F230","sexo":"femea","nasc":"2025-12-31","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F148","_ts":1781742357628},{"_id":"F231","id":"F231","sexo":"femea","nasc":"2026-01-03","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"223","obs":"S. ANTES ERA 223. Pariu 22/12/2025 (F221)","_ts":1781742357628},{"_id":"F232","id":"F232","sexo":"femea","nasc":"2026-01-03","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F110. AFOGADA EM BEBEDOURO","_ts":1781742357628},{"_id":"F233","id":"F233","sexo":"femea","nasc":"2026-01-06","mae":"","pai":"","raca":"","conf":"","situacao":"morte","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F098. MÃE 098 NÃO CRIOU O FILHOTE","_ts":1781742357628},{"_id":"F234","id":"F234","sexo":"femea","nasc":"2026-01-06","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F101","_ts":1781742357628},{"_id":"F235","id":"F235","sexo":"femea","nasc":"2026-01-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F033","_ts":1781742357628},{"_id":"F236","id":"F236","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"48","obs":"S. ANTES ERA 048. Pariu 12/01/2026 (F237)","_ts":1781742357628},{"_id":"F237","id":"F237","sexo":"femea","nasc":"2026-01-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F236","_ts":1781742357628},{"_id":"F238","id":"F238","sexo":"femea","nasc":"2026-01-23","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F027","_ts":1781742357628},{"_id":"F239","id":"F239","sexo":"femea","nasc":"2026-01-23","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F085","_ts":1781742357628},{"_id":"F240","id":"F240","sexo":"femea","nasc":"2026-01-23","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 23/01/2026 (M247)","_ts":1781742357628},{"_id":"F241","id":"F241","sexo":"femea","nasc":"2026-01-24","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S.","_ts":1781742357628},{"_id":"F242","id":"F242","sexo":"femea","nasc":"2026-01-24","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S.","_ts":1781742357628},{"_id":"F243","id":"F243","sexo":"femea","nasc":"2026-01-24","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 10/06/2026 (M255/F253)","_ts":1781742357628},{"_id":"F244","id":"F244","sexo":"femea","nasc":"2022-12-18","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"207","obs":"S. ANTES ERA 207. Pariu 16/05/2025 (2F-165/166); 28/12/2025 (M238)","_ts":1781742357628},{"_id":"F245","id":"F245","sexo":"femea","nasc":"2026-01-24","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S. Pariu 13/06/2026 (F256)","_ts":1781742357628},{"_id":"F246","id":"F246","sexo":"femea","nasc":"2026-01-24","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S.","_ts":1781742357628},{"_id":"F247","id":"F247","sexo":"femea","nasc":"2026-01-24","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"S.","_ts":1781742357628},{"_id":"F248","id":"F248","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"53","obs":"S. ANTES ERA 053. Pariu 19/05/2025 (M); 22/12/2025 (M240)","_ts":1781742357628},{"_id":"F249","id":"F249","sexo":"femea","nasc":"2023-08-12","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"47","obs":"S. ANTES ERA 047. Pariu 30/06/2025 (F170); 06/01/2026 (M242)","_ts":1781742357628},{"_id":"F250","id":"F250","sexo":"femea","nasc":"2026-03-25","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F063","_ts":1781742357628},{"_id":"F251","id":"F251","sexo":"femea","nasc":"2026-05-20","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F103","_ts":1781742357628},{"_id":"F252","id":"F252","sexo":"femea","nasc":"2026-05-20","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F103","_ts":1781742357628},{"_id":"F253","id":"F253","sexo":"femea","nasc":"2026-06-10","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F243","_ts":1781742357628},{"_id":"F254","id":"F254","sexo":"femea","nasc":"2026-06-11","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F106","_ts":1781742357628},{"_id":"F255","id":"F255","sexo":"femea","nasc":"2026-06-13","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F090","_ts":1781742357628},{"_id":"F256","id":"F256","sexo":"femea","nasc":"2026-06-13","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F045","_ts":1781742357628},{"_id":"F257","id":"F257","sexo":"femea","nasc":"2026-06-15","mae":"","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Filha de F135","_ts":1781742357628},{"_id":"M258","id":"M258","sexo":"macho","nasc":"2026-06-17","mae":"F077","pai":"","raca":"","conf":"","situacao":"ativo","pesoEntrada":null,"pesoVenda":null,"rend":null,"brincoAnt":"","obs":"Nascido 17/06/2026 — filho de F077","_ts":1781814352535}],"pesagens":[{"_id":"p0","animal":"M225","data":"2026-06-17","peso":41.35,"obs":"","_ts":1781742430351},{"_id":"p1","animal":"M229","data":"2026-06-17","peso":34.4,"obs":"","_ts":1781742430351},{"_id":"p2","animal":"M230","data":"2026-06-17","peso":32.7,"obs":"","_ts":1781742430351},{"_id":"p3","animal":"M231","data":"2026-06-17","peso":33.3,"obs":"","_ts":1781742430351},{"_id":"p4","animal":"M236","data":"2026-06-17","peso":35.2,"obs":"","_ts":1781742430351},{"_id":"p5","animal":"M232","data":"2026-06-12","peso":32.9,"obs":"","_ts":1781742430351},{"_id":"p6","animal":"M233","data":"2026-06-12","peso":32.85,"obs":"","_ts":1781742430351},{"_id":"p7","animal":"M235","data":"2026-06-12","peso":30.6,"obs":"","_ts":1781742430351},{"_id":"p8","animal":"M237","data":"2026-06-12","peso":29.4,"obs":"","_ts":1781742430351},{"_id":"p9","animal":"M239","data":"2026-06-12","peso":30.35,"obs":"","_ts":1781742430351},{"_id":"p10","animal":"M241","data":"2026-06-12","peso":28.85,"obs":"","_ts":1781742430351},{"_id":"p11","animal":"M244","data":"2026-06-12","peso":30.3,"obs":"","_ts":1781742430351},{"_id":"p12","animal":"M245","data":"2026-06-12","peso":20.35,"obs":"","_ts":1781742430351},{"_id":"p13","animal":"M248","data":"2026-06-12","peso":28.8,"obs":"","_ts":1781742430351},{"_id":"p14","animal":"M249","data":"2026-06-12","peso":30.6,"obs":"","_ts":1781742430351},{"_id":"p15","animal":"M251","data":"2026-06-12","peso":32.25,"obs":"Mamadeira","_ts":1781742430351},{"_id":"p16","animal":"M254","data":"2026-06-12","peso":30.8,"obs":"","_ts":1781742430351},{"_id":"p17","animal":"M256","data":"2026-06-12","peso":21.6,"obs":"","_ts":1781742430351},{"_id":"p18","animal":"M242","data":"2026-06-07","peso":32.3,"obs":"","_ts":1781742430351}],"saude":[],"manejo":[],"confinamentos":[{"id":"C01","nome":"CONF 01","inicio":"2025-10-01","fim":"2025-11-09","status":"concluido","local":"","obs":"Out/2025"},{"id":"C02","nome":"CONF 02","inicio":"2025-10-16","fim":"2025-12-27","status":"concluido","local":"","obs":"Out–Dez/2025 · 73 dias"},{"id":"C03","nome":"CONF 03","inicio":"2025-12-27","fim":"2026-01-26","status":"concluido","local":"","obs":"Jan/2026"},{"id":"C04","nome":"CONF 04","inicio":"2026-01-27","fim":null,"status":"concluido","local":"","obs":"Fev/2026 em diante"},{"id":"C05","nome":"CONF 05","inicio":"2026-02-01","fim":null,"status":"ativo","local":"","obs":"Em andamento"},{"id":"C06","nome":"CONF 06","inicio":"2025-12-27","fim":null,"status":"ativo","local":"","obs":"Em andamento"}],"_v":5};
+const FEMEAS_DATA=[
+[22,"18/12/2022","19/12/2024","","","","",""],
+[23,"18/12/2022","","09/08/2025 (F191)","","X","",""],
+[24,"18/12/2022","","","","","",""],
+[25,"18/12/2022","","01/06/2025","","","",""],
+[26,"18/12/2022","19/12/2024","","","","",""],
+[27,"18/12/2022","","30/12/2024 (F152)","23/01/2026 (M246/F238)","X","X","Abandono e morte dos filhotes 14/07/2025"],
+[28,"18/12/2022","","12/08/2023 (F073) / 20/05/2025 (F151) / 06/12/2025 (M+F212)","","X","X","01 borrego macho morreu 13/12/2025"],
+[29,"18/12/2022","","03/06/2025 (M+F176) / 18/12/2025 (M227)","","X","X",""],
+[30,"18/12/2022","12/08/2023","","","","",""],
+[31,"18/12/2022","","05/05/2025 (M) / 07/12/2025 (F213)","","X","X",""],
+[32,"18/12/2022","","17/06/2025 (M)","","X","",""],
+[33,"18/12/2022","","31/05/2025 (F157)","12/01/2026 (F235)","X","X",""],
+[34,"18/12/2022","","10/06/2025 (M)","25/12/2025 (F226)","X","X",""],
+[36,"18/12/2022","","17/06/2025 (F180)","","X","X",""],
+[37,"18/12/2022","","20/07/2025 (F190)","","X","",""],
+[38,"18/12/2022","22/06/2024","","","","",""],
+[39,"18/12/2022","","26/06/2025 (M+F173)","","X","",""],
+[40,"18/12/2022","17/12/2023","","","","",""],
+[41,"18/12/2022","","18/06/2025 (M)","","X","",""],
+[43,"18/12/2022","19/12/2024","","","","",""],
+[44,"18/12/2022","","11/09/2025 (F196)","","X","X",""],
+[45,"18/12/2022","22/06/2024","","","","",""],
+[46,"12/08/2023","","18/05/2025 (F154)","","X","",""],
+[47,"12/08/2023","","30/06/2025 (F170)","06/01/2026 (M242)","","","Trocou brinco para F249 em 31/03/2026"],
+[48,"18/12/2022","","","","","","Trocou brinco para F236 em 12/01/2026"],
+[49,"12/08/2023","17/12/2023","","","","",""],
+[50,"12/08/2023","","03/07/2025 (F185)","","X","X",""],
+[52,"12/08/2023","","28/06/2025 (M)","","X","X","CEGO"],
+[53,"12/08/2023","","19/05/2025 (M) / 22/12/2025 (M240)","","","","Trocou brinco para F248 em 24/01/2026"],
+[54,"12/08/2023","","09/06/2025 (F177)","02/02/2026 (M248)","X","X",""],
+[55,"12/08/2023","","09/09/2025 (F195)","","X","X",""],
+[56,"12/08/2023","22/06/2024","","","","",""],
+[58,"12/08/2023","19/12/2024","","","","",""],
+[59,"12/08/2023","","17/06/2025 (F178) / 24/12/2025 (M235)","","X","X",""],
+[60,"12/08/2023","19/12/2024","","","","",""],
+[61,"12/08/2023","","21/01/2025 (M)","","X","",""],
+[62,"12/08/2023","","14/09/2025 (M208)","","X","X",""],
+[63,"01/05/2020","","","25/03/2026 (M252/F250)","X","X","BOA DE LEITE"],
+[64,"12/08/2023","19/12/2024","","","","",""],
+[65,"12/08/2023","","10/06/2025 (M)","","X","",""],
+[66,"12/08/2023","","07/06/2025 (F175)","","X","",""],
+[67,"01/05/2020","","04/12/2025 (M236+F211)","","X","X","V CHITADA"],
+[68,"01/05/2020","17/12/2023","","","","",""],
+[69,"12/08/2023","","","21/03/2026 (M250)","X","X",""],
+[70,"12/08/2023","22/06/2024","","","","",""],
+[71,"12/08/2023","17/12/2023","","","","",""],
+[72,"01/05/2020","17/12/2023","","","","",""],
+[73,"12/08/2023","","","","X","","F028"],
+[74,"01/05/2020","19/12/2024","","","","",""],
+[75,"17/12/2023","","","","X","X",""],
+[76,"17/12/2023","","","","X","X",""],
+[77,"17/12/2023","","30/08/2025 (M)","","X","X",""],
+[78,"17/12/2023","22/06/2024","","","","",""],
+[79,"17/12/2023","","02/10/2025 (M)","","X","X",""],
+[80,"17/12/2023","","","","X","X",""],
+[81,"17/12/2023","03/10/2025","","","","","Morte de um macho por intoxicação com ureia"],
+[82,"17/12/2023","","17/07/2025 (M)","","X","",""],
+[83,"17/12/2023","","15/06/2025 (F172)","","X","X",""],
+[84,"17/12/2023","05/11/2025","","","","",""],
+[85,"17/12/2023","","03/07/2025 (M)","23/01/2026 (F239)","X","X",""],
+[86,"17/12/2023","22/06/2024","","","","",""],
+[87,"22/06/2024","19/12/2024","","","","",""],
+[88,"22/06/2024","","02/09/2025 (F194)","","X","",""],
+[89,"22/06/2024","","14/06/2025 (F182)","","X","",""],
+[90,"22/06/2024","","21/08/2025 (F193)","13/06/2026 (F255)","X","X",""],
+[91,"22/06/2024","19/12/2024","","","","",""],
+[92,"22/06/2024","","","","X","X",""],
+[93,"12/08/2023","","03/10/2025 (F208)","","X","X","Saiu da maternidade em 23/10/2025"],
+[94,"22/06/2024","","15/09/2025 (M211)","","X","X",""],
+[95,"22/06/2024","","24/08/2025 (M)","","X","X",""],
+[96,"22/06/2024","04/02/2026","26/08/2025 (M209)","","X","",""],
+[97,"22/06/2024","08/12/2025","","","","",""],
+[98,"22/06/2024","","","06/01/2026 (F233)","X","X",""],
+[99,"22/06/2024","","18/06/2025 (F183) / 22/12/2025 (M)","","X","",""],
+[100,"22/06/2024","19/12/2024","","","","",""],
+[101,"18/12/2022","","14/06/2025 (F171)","06/01/2026 (M243/F234)","X","X",""],
+[102,"18/12/2022","27/11/2025","07/05/2025 (F153)","","","","Aborto em 27/11/2025"],
+[103,"18/12/2022","","19/05/2025 (M+F163)","20/05/2026 (2F251/252)","X","X",""],
+[104,"18/12/2022","22/06/2024","","","","",""],
+[105,"18/12/2022","12/08/2023","","","","",""],
+[106,"18/12/2022","","08/07/2025 (F186)","11/06/2026 (F254)","X","X",""],
+[108,"18/12/2022","","26/05/2025 (M+F159) / 09/12/2025 (M)","","X","X","Morte do filhote 19/12/2025"],
+[109,"18/12/2022","","01/05/2025 (F150) / 01/12/2025 (F210)","","X","X",""],
+[110,"18/12/2022","","05/06/2025 (F179)","03/01/2026 (F232)","X","X",""],
+[111,"18/12/2022","17/12/2023","","","","",""],
+[112,"18/12/2022","12/08/2023","","","","",""],
+[113,"18/12/2022","","","","X","",""],
+[114,"18/12/2022","","23/06/2025 (M)","28/12/2025 (F228)","X","X",""],
+[115,"22/06/2024","","22/12/2025 (M239)","","X","X",""],
+[116,"22/06/2024","","","","X","X",""],
+[117,"22/06/2024","","09/09/2025 (M213)","","X","X","Pariu 1 fêmea junto c/ macho — fêmea injetada e morreu"],
+[118,"22/06/2024","","22/08/2025 (M214)","","X","X",""],
+[119,"22/06/2024","","30/10/2025 (M222)","","X","X",""],
+[120,"22/06/2024","","","","X","X",""],
+[121,"22/06/2024","","07/06/2025 (M)","16/12/2025 (F218)","X","X",""],
+[123,"22/06/2024","","","","X","X",""],
+[124,"22/06/2024","","14/10/2025 (M223)","","X","X",""],
+[125,"19/12/2024","","","","X","X",""],
+[126,"19/12/2024","","12/12/2025 (F216)","","X","X",""],
+[127,"19/12/2024","","","","X","X",""],
+[128,"19/12/2024","","","","X","X",""],
+[129,"19/12/2024","","","","X","X",""],
+[130,"19/12/2024","","","","X","X",""],
+[131,"19/12/2024","02/08/2025","","","","",""],
+[132,"19/12/2024","","","","X","X",""],
+[133,"19/12/2024","","","","X","X",""],
+[134,"19/12/2024","","14/12/2025 (F217)","","X","X",""],
+[135,"19/12/2024","","","15/06/2026 (F257)","X","X",""],
+[136,"19/12/2024","","08/12/2025 (M237)","","X","X",""],
+[137,"19/12/2024","","09/12/2025 (M230)","","X","X",""],
+[138,"19/12/2024","","","","X","",""],
+[139,"19/12/2024","03/10/2025","","","","","Morte de um macho por intoxicação com ureia"],
+[140,"19/12/2024","","","","X","X",""],
+[141,"19/12/2024","03/01/2026","26/09/2025 (F197)","","","",""],
+[142,"19/12/2024","","","","X","",""],
+[143,"19/12/2024","","22/06/2025 (F181) / 24/12/2025 (F225)","","X","X","S"],
+[144,"19/12/2024","","22/05/2025 (F161) / 07/12/2025 (M229)","","X","X","S"],
+[145,"19/12/2024","","11/05/2025 (F160) / 08/12/2025 (F214)","","X","X","S"],
+[146,"19/12/2024","","25/05/2025 (M) / 10/12/2025 (F215)","","X","X","S"],
+[147,"19/12/2024","","28/06/2025 (F174)","","X","X","S"],
+[148,"19/12/2024","","29/06/2025 (M) / 31/12/2025 (F230)","","X","X","S"],
+[149,"","","","","X","X",""],
+[150,"01/05/2025","","","","X","X","Filha de F109"],
+[151,"20/05/2025","","","","X","X","Filha de F028"],
+[152,"30/12/2024","","","","X","X","Filha de F027"],
+[153,"07/05/2025","","","","X","X","Filha de F102"],
+[154,"18/05/2025","","","","X","X","Filha de F046"],
+[155,"","","","","X","X",""],
+[156,"11/05/2025","25/07/2025","","","","","Filha de F203"],
+[157,"31/05/2025","","","","X","X","Filha de F033"],
+[158,"01/06/2025","10/01/2026","","","","","Filha de F169"],
+[159,"26/05/2025","","","","X","X","Filha de F108"],
+[160,"11/05/2025","","","","X","X","Filha de F145"],
+[161,"22/05/2025","","","","X","X","Filha de F144"],
+[162,"","","","","X","X",""],
+[163,"19/05/2025","","","","X","X","Filha de F103"],
+[164,"01/06/2025","","","","X","","Filha de F168"],
+[165,"16/05/2025","","","","X","X","Filha de F207"],
+[166,"16/05/2025","","","","X","X","Filha de F207"],
+[167,"01/06/2025","","","09/01/2026 (M244)","X","X","S"],
+[168,"01/06/2025","","01/06/2025 (F164)","10/01/2026 (M245)","X","X","S"],
+[169,"01/06/2025","","01/06/2025 (F158)","16/12/2025 (M228)","X","X","S"],
+[170,"30/06/2025","","","","X","X","Filha de F047"],
+[171,"14/06/2025","","","","X","X","Filha de F101"],
+[172,"15/06/2025","","","","X","X","Filha de F083"],
+[173,"26/06/2025","15/08/2025","","","","","Filha de F039"],
+[174,"28/06/2025","","","","X","X","Filha de F147"],
+[175,"07/06/2025","","","","X","X","Filha de F066"],
+[176,"03/06/2025","","","","X","","Filha de F029"],
+[177,"09/06/2025","18/07/2025","","","","","Filha de F054"],
+[178,"17/06/2025","","","","X","X","Filha de F059"],
+[179,"05/06/2025","13/07/2025","","","","","Filha de F110"],
+[180,"17/06/2025","","","","X","X","Filha de F036"],
+[181,"22/06/2025","","","","X","X","Filha de F143"],
+[182,"14/06/2025","","","","X","X","Filha de F089"],
+[183,"18/06/2025","","","","X","X","Filha de F099"],
+[184,"","","","","","","BRINCO EXTRAVIADO"],
+[185,"03/07/2025","","","","X","X","Filha de F050"],
+[186,"08/07/2025","","","","X","X","Filha de F106"],
+[187,"19/07/2025","","","","X","X","Filha de F202"],
+[188,"19/07/2025","","","","X","X","Comprada de Isac — CABELUDA"],
+[189,"31/10/2025","","","","X","X","Comprada de Isac — LISA"],
+[190,"20/07/2025","","","","X","X","Filha de F037"],
+[191,"09/08/2025","","","","X","X","Filha de F023"],
+[192,"10/08/2025","","","06/02/2026 (M249)","X","X","S"],
+[193,"21/08/2025","","","","X","X","Filha de F090"],
+[194,"02/09/2025","02/12/2025","","","","","Morte por cachorro"],
+[195,"09/09/2025","","","","X","X","Filha de F055"],
+[196,"11/09/2025","","","","X","X","Filha de F044"],
+[197,"26/09/2025","16/10/2025","","","","","Filha de F141"],
+[201,"22/12/2025","","16/12/2025 (M225)","","X","X","S"],
+[202,"18/12/2022","","19/07/2025 (F187)","","X","",""],
+[203,"18/12/2022","","11/05/2025 (M+F156) / 19/12/2025 (M231)","","X","X","Só tem 01 peito funcionando"],
+[204,"18/12/2022","","04/06/2025 (M) / 06/12/2025 (2M-232/241)","","X","X",""],
+[205,"18/12/2022","19/12/2024","","","","",""],
+[207,"18/12/2022","","16/05/2025 (2F165/166) / 28/12/2025 (M238)","","X","X","Trocou brinco para F244 em 24/01/2026"],
+[208,"03/10/2025","","","","X","X","Filha de F093"],
+[209,"22/06/2024","","16/10/2025 (M233)","12/06/2026 (M257)","X","X","Antes era F122"],
+[210,"01/12/2025","","","","X","X","Filha de F109"],
+[211,"04/12/2025","26/05/2026","","","X","X","Filha de F067 — falta de respiração"],
+[212,"06/12/2025","","","","X","","Filha de F028"],
+[213,"07/12/2025","","","","X","X","Filha de F031"],
+[214,"08/12/2025","","","","X","X","Filha de F145"],
+[215,"10/12/2025","","","","X","X","Filha de F146"],
+[216,"12/12/2025","","12/12/2025 (M)","","X","X","Filha de F126"],
+[217,"14/12/2025","","","","X","X","Filha de F134"],
+[218,"16/12/2025","","","","X","X","Filha de F121"],
+[219,"22/12/2025","","","","X","X","Filha de F220"],
+[220,"22/12/2025","","22/12/2025 (F219)","","X","X","S"],
+[221,"22/12/2025","","","","X","X","Filha de F231"],
+[222,"22/12/2025","","22/12/2025 (M)","","X","X","S"],
+[223,"22/12/2025","","22/12/2025 (F221)","","X","X","S — Trocou brinco para F231"],
+[224,"22/12/2025","","","","X","X","S"],
+[225,"24/12/2025","","","","X","X","Filha de F143"],
+[226,"25/12/2025","","","","X","","Filha de F034"],
+[227,"28/12/2025","","15/12/2025 (M226)","","X","X","S — borrego morreu 02/01/2026"],
+[228,"28/12/2025","","","","X","X","Filha de F228"],
+[229,"03/01/2026","","15/12/2025 (M234)","","X","X","S"],
+[230,"31/12/2025","","","","X","X","Filha de F148"],
+[231,"03/01/2026","","22/12/2025 (F221)","","X","X","S — antes era F223"],
+[232,"03/01/2026","22/02/2026","","","X","","Filha de F110 — afogada em bebedouro"],
+[233,"06/01/2026","31/01/2026","","","X","","Filha de F098 — mãe não criou"],
+[234,"06/01/2026","","","","X","X","Filha de F101"],
+[235,"12/01/2026","","","","X","X","Filha de F033"],
+[236,"18/12/2022","","12/01/2026 (F237)","","X","X","S — antes era F048"],
+[237,"12/01/2026","","","","X","X","Filha de F236"],
+[238,"23/01/2026","","","","X","","Filha de F027"],
+[239,"23/01/2026","","","","X","","Filha de F085"],
+[240,"23/01/2026","","23/01/2026 (M247)","","X","","S"],
+[241,"24/01/2026","","","","X","X","S"],
+[242,"24/01/2026","","","","X","X","S"],
+[243,"24/01/2026","","","10/06/2026 (M255/F253)","X","X","S"],
+[244,"18/12/2022","","16/05/2025 (2F165/166) / 28/12/2025 (M238)","","X","X","S — antes era F207"],
+[245,"24/01/2026","","","13/06/2026 (F256)","X","X","S"],
+[246,"24/01/2026","","","","X","X","S"],
+[247,"24/01/2026","","","","X","X","S"],
+[248,"12/08/2023","","19/05/2025 (M) / 22/12/2025 (M240)","","X","X","S — antes era F053"],
+[249,"12/08/2023","","30/06/2025 (F170)","06/01/2026 (M242)","X","X","S — antes era F047"],
+[250,"25/03/2026","","","","X","","Filha de F063"],
+[251,"20/05/2026","","","","","","Filha de F103"],
+[252,"20/05/2026","","","","","","Filha de F103"],
+[253,"10/06/2026","","","","","","Filha de F243"],
+[254,"11/06/2026","","","","","","Filha de F106"],
+[255,"13/06/2026","","","","","","Filha de F090"],
+[256,"13/06/2026","","","","","","Filha de F045"],
+[257,"15/06/2026","","","","","","Filha de F135"]
+];
+
+// ══════════════════════════════════════════════
+// SUPABASE API
+// ══════════════════════════════════════════════
+async function sbFetch(table, method, body, params) {
+  var url = SUPABASE_URL + '/rest/v1/' + table;
+  if (params) url += '?' + params;
+  var opts = {
+    method: method || 'GET',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'resolution=merge-duplicates' : ''
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    var resp = await fetch(url, opts);
+    if (resp.status === 204) return [];
+    var data = await resp.json();
+    return data;
+  } catch(e) {
+    console.warn('Supabase offline:', e.message);
+    return null;
+  }
+}
+
+async function sbUpsert(table, rows) {
+  if (!rows || !rows.length) return;
+  // Divide em lotes de 100
+  for (var i = 0; i < rows.length; i += 100) {
+    var lote = rows.slice(i, i+100);
+    await sbFetch(table, 'POST', lote, null);
+  }
+}
+
+async function sbGet(table) {
+  return await sbFetch(table, 'GET', null, 'select=*&limit=10000');
+}
+
+async function sbDelete(table, id) {
+  return await sbFetch(table, 'DELETE', null, 'id=eq.' + id);
+}
+
+// ══════════════════════════════════════════════
+// DB LOCAL (offline-first)
+// ══════════════════════════════════════════════
+const DB_KEY = 'ovinos_sc27';
+function loadDB() {
+  try { var r = localStorage.getItem(DB_KEY); if(r) return JSON.parse(r); } catch(e) {}
+  return {animais:[],pesagens:[],saude:[],manejo:[],confinamentos:[],paricoes:[],_v:0,_pendente:[]};
+}
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+let db = {animais:[],pesagens:[],saude:[],manejo:[],confinamentos:[],paricoes:[],_v:0,_pendente:[]};
+
+// ══════════════════════════════════════════════
+// SYNC SUPABASE ↔ LOCAL
+// ══════════════════════════════════════════════
+var modoOnline = false;
+
+async function verificaConexao() {
+  var r = await sbGet('confinamentos');
+  modoOnline = r !== null;
+  var el = document.getElementById('status-online');
+  if (el) {
+    el.textContent = modoOnline ? '🟢 Online' : '🔴 Offline';
+    el.style.color = modoOnline ? 'var(--sprout)' : 'var(--rust)';
+  }
+  return modoOnline;
+}
+
+async function sincronizar() {
+  var online = await verificaConexao();
+  if (!online) {
+    toast('Sem internet — modo offline', true);
+    return;
+  }
+
+  toast('Sincronizando...');
+
+  // 1. Envia pendentes locais para o Supabase
+  var pendente = db._pendente || [];
+  for (var i = 0; i < pendente.length; i++) {
+    var op = pendente[i];
+    if (op.tipo === 'upsert') {
+      await sbUpsert(op.tabela, [op.dado]);
+    } else if (op.tipo === 'delete') {
+      await sbDelete(op.tabela, op.id);
+    }
+  }
+  db._pendente = [];
+
+  // 2. Baixa dados do Supabase
+  var [animais, pesagens, confs, saude, manejo, paricoes] = await Promise.all([
+    sbGet('animais'), sbGet('pesagens'), sbGet('confinamentos'),
+    sbGet('saude'), sbGet('manejo'), sbGet('paricoes')
+  ]);
+
+  if (animais && animais.length > 0) {
+    db.animais = animais.map(function(a) {
+      return {
+        _id: a.id, id: a.id, sexo: a.sexo, nasc: a.nasc||'', mae: a.mae||'',
+        pai: a.pai||'', raca: a.raca||'', conf: a.conf||'',
+        situacao: a.situacao||'ativo', pesoEntrada: a.peso_entrada,
+        pesoVenda: a.peso_venda, rend: a.rend_carcaca,
+        brincoAnt: a.brinco_ant||'', obs: a.obs||'', _ts: Date.now()
+      };
+    });
+  }
+  if (pesagens && pesagens.length >= 0) {
+    db.pesagens = pesagens.map(function(p) {
+      return {_id:p.id, animal:p.animal, data:p.data, peso:p.peso, obs:p.obs||'', _ts:Date.now()};
+    });
+  }
+  if (confs && confs.length >= 0) {
+    db.confinamentos = confs.map(function(c) {
+      return {id:c.id, nome:c.nome, inicio:c.inicio||'', fim:c.fim||'', local:c.local||'', status:c.status||'ativo', obs:c.obs||''};
+    });
+  }
+  if (saude && saude.length >= 0) {
+    db.saude = saude.map(function(s) {
+      return {_id:s.id, tipo:s.tipo, animal:s.animal||'', data:s.data, produto:s.produto||'', dose:s.dose||'', via:s.via||'', proxima:s.proxima||'', motivo:s.motivo||'', resp:s.resp||'', obs:s.obs||'', _ts:Date.now()};
+    });
+  }
+  if (manejo && manejo.length >= 0) {
+    db.manejo = manejo.map(function(m) {
+      return {_id:m.id, tipo:m.tipo, animal:m.animal||'', data:m.data, detalhe:m.detalhe||'', resp:m.resp||'', obs:m.obs||'', _ts:Date.now()};
+    });
+  }
+  if (paricoes && paricoes.length >= 0) {
+    db.paricoes = paricoes.map(function(p) {
+      return {_id:p.id, mae:p.mae||'', data:p.data, machos:p.machos||0, femeas:p.femeas||0, filhos:p.filhos||'', pai:p.pai||'', obs:p.obs||'', _ts:Date.now()};
+    });
+  }
+
+  db._v = SEED_VERSION;
+  saveDB(db);
+  renderDashboard();
+  toast('✓ Sincronizado com a nuvem');
+}
+
+// Adiciona operação pendente (para quando offline)
+function addPendente(tipo, tabela, dado, id) {
+  if (!db._pendente) db._pendente = [];
+  db._pendente.push({tipo:tipo, tabela:tabela, dado:dado, id:id, ts:Date.now()});
+  saveDB(db);
+}
+
+// Converte animal local → formato Supabase
+function animalParaSB(a) {
+  return {
+    id: a._id, sexo: a.sexo, nasc: a.nasc||null, mae: a.mae||null,
+    pai: a.pai||null, raca: a.raca||null, conf: a.conf||null,
+    situacao: a.situacao||'ativo', peso_entrada: a.pesoEntrada||null,
+    peso_venda: a.pesoVenda||null, rend_carcaca: a.rend||null,
+    brinco_ant: a.brincoAnt||null, obs: a.obs||null
+  };
+}
+
+// ══════════════════════════════════════════════
+// SEED — popula Supabase na primeira vez
+// ══════════════════════════════════════════════
+async function seedSC27() {
+  // Limpeza localStorage antigo
+  try {
+    var stored = localStorage.getItem(DB_KEY);
+    if (stored) {
+      var d = JSON.parse(stored);
+      var semPrefixo = d.animais && d.animais.some(function(a){ return !/^[MF]/.test(a._id); });
+      var versaoAntiga = !d._v || d._v < SEED_VERSION;
+      var totalErrado = d.animais && d.animais.length < 50;
+      if (semPrefixo || versaoAntiga || totalErrado) {
+        localStorage.removeItem(DB_KEY);
+      }
+    }
+  } catch(e) { localStorage.removeItem(DB_KEY); }
+
+  db = loadDB();
+
+  // Verifica se tem dados locais válidos
+  if (db.animais && db.animais.length >= 50 && db._v >= SEED_VERSION) {
+    return; // dados ok
+  }
+
+  // Tenta carregar do Supabase
+  var online = await verificaConexao();
+  if (online) {
+    var animaisSB = await sbGet('animais');
+    if (animaisSB && animaisSB.length > 50) {
+      // Supabase já tem dados — sincroniza
+      await sincronizar();
+      return;
+    }
+    // Supabase vazio — envia seed
+    toast('Carregando dados iniciais...');
+    var animaisSBFormat = seed.animais.map(animalParaSB);
+    await sbUpsert('animais', animaisSBFormat);
+    var confsSBFormat = seed.confinamentos.map(function(c){ return {id:c.id,nome:c.nome,inicio:c.inicio||null,fim:c.fim||null,local:c.local||null,status:c.status,obs:c.obs||null}; });
+    await sbUpsert('confinamentos', confsSBFormat);
+    var pesagensSBFormat = seed.pesagens.map(function(p){ return {id:p._id,animal:p.animal,data:p.data,peso:p.peso,obs:p.obs||null}; });
+    await sbUpsert('pesagens', pesagensSBFormat);
+    await sincronizar();
+  } else {
+    // Offline — usa seed local
+    db.animais = seed.animais;
+    db.pesagens = seed.pesagens;
+    db.confinamentos = seed.confinamentos;
+    db.saude = [];
+    db.manejo = [];
+    db.paricoes = [];
+    db._v = SEED_VERSION;
+    db._pendente = [];
+    saveDB(db);
+  }
+}
+
+// ══════════════════════════════════════════════
+// DB — overrides para sincronizar com Supabase
+// ══════════════════════════════════════════════
+async function salvarAnimalSB(a) {
+  var dado = animalParaSB(a);
+  if (modoOnline) {
+    await sbUpsert('animais', [dado]);
+  } else {
+    addPendente('upsert', 'animais', dado);
+  }
+}
+async function deletarAnimalSB(id) {
+  if (modoOnline) {
+    await sbDelete('animais', id);
+  } else {
+    addPendente('delete', 'animais', null, id);
+  }
+}
+async function salvarPesagemSB(p) {
+  var dado = {id:p._id, animal:p.animal, data:p.data, peso:p.peso, obs:p.obs||null};
+  if (modoOnline) {
+    await sbUpsert('pesagens', [dado]);
+  } else {
+    addPendente('upsert', 'pesagens', dado);
+  }
+}
+async function deletarPesagemSB(id) {
+  if (modoOnline) { await sbDelete('pesagens', id); }
+  else { addPendente('delete', 'pesagens', null, id); }
+}
+async function salvarParicaoSB(p) {
+  var dado = {id:p._id, mae:p.mae, data:p.data, machos:p.machos||0, femeas:p.femeas||0, filhos:p.filhos||null, pai:p.pai||null, obs:p.obs||null};
+  if (modoOnline) { await sbUpsert('paricoes', [dado]); }
+  else { addPendente('upsert', 'paricoes', dado); }
+}
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function uid() { return Math.random().toString(36).slice(2,10); }
+function fmtDate(d) { if(!d) return '—'; var p=d.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+function today() { return new Date().toISOString().slice(0,10); }
+function fmtN(v,dec) { if(v==null) return '—'; dec=dec||2; return Number(v).toFixed(dec).replace('.',','); }
+function toast(msg, err) {
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.className='show'+(err?' err':'');
+  setTimeout(function(){ t.className=''; }, 2500);
+}
+function getConf(id) { return db.confinamentos.find(function(c){ return c.id===id; })||null; }
+function getAnimal(id) { return db.animais.find(function(a){ return a._id===id||a.id===id; })||null; }
+function ultimoPeso(animalId) {
+  var ps=db.pesagens.filter(function(p){ return p.animal===animalId; }).sort(function(a,b){ return b.data.localeCompare(a.data); });
+  return ps[0]||null;
+}
+function statusBadge(s) {
+  var map={
+    'ativo':'<span class="badge badge-active">Ativo</span>',
+    'vendido':'<span class="badge badge-sold">Vendido</span>',
+    'abate':'<span class="badge badge-abate">Abate W</span>',
+    'morte':'<span class="badge badge-dead">Morte</span>',
+    'desaparecido':'<span class="badge badge-gone">Desap.</span>',
+    'renumerado':'<span class="badge badge-swap">↺ Renum.</span>'
+  };
+  return map[s]||s;
+}
+
+// ══════════════════════════════════════════════
+// NAVEGAÇÃO
+// ══════════════════════════════════════════════
+function navTo(page, btn) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('page-'+page).classList.add('active');
+  if(btn) btn.classList.add('active');
+  else document.querySelectorAll('.nav-btn').forEach(function(b){
+    if(b.getAttribute("onclick")&&b.getAttribute("onclick").indexOf("'"+page+"'")>=0) b.classList.add('active');
+  });
+  renderPage(page);
+}
+function renderPage(page) {
+  if(page==='dashboard')    renderDashboard();
+  if(page==='femeas')       renderFemeas();
+  if(page==='pesagens')     renderPesagens();
+  if(page==='saude')        renderSaude();
+  if(page==='manejo')       renderManejo();
+  if(page==='confinamentos') renderConfs();
+}
+
+// ══════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if(id==='modal-animal') {
+    var sel=document.getElementById('a-conf');
+    sel.innerHTML='<option value="">— Nenhum —</option>';
+    db.confinamentos.forEach(function(c){ sel.innerHTML+='<option value="'+c.id+'">'+c.nome+'</option>'; });
+  }
+  if(id==='modal-pesagem') {
+    var sel=document.getElementById('p-animal');
+    sel.innerHTML='<option value="">Selecionar...</option>';
+    var ativos=db.animais.filter(function(a){ return a.situacao==='ativo'; }).sort(function(a,b){ return a._id.localeCompare(b._id,undefined,{numeric:true}); });
+    ativos.forEach(function(a){ sel.innerHTML+='<option value="'+a._id+'">'+a._id+' '+(a.sexo==='macho'?'♂':'♀')+'</option>'; });
+    document.getElementById('p-data').value=today();
+  }
+  if(id==='modal-paricao') {
+    var sel=document.getElementById('par-mae');
+    sel.innerHTML='<option value="">Selecionar...</option>';
+    var fativos=db.animais.filter(function(a){ return a.sexo==='femea'&&a.situacao==='ativo'; }).sort(function(a,b){ return a._id.localeCompare(b._id,undefined,{numeric:true}); });
+    fativos.forEach(function(a){ sel.innerHTML+='<option value="'+a._id+'">'+a._id+'</option>'; });
+    document.getElementById('par-data').value=today();
+    document.getElementById('par-machos').value=0;
+    document.getElementById('par-femeas').value=0;
+    document.getElementById('par-filhos').value='';
+    document.getElementById('par-pai').value='';
+    document.getElementById('par-obs').value='';
+  }
+  if(id==='modal-vacina'||id==='modal-med') {
+    var df=id==='modal-vacina'?'v-data':'m-data';
+    document.getElementById(df).value=today();
+  }
+  if(id==='modal-manejo') document.getElementById('mj-data').value=today();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(function(m){
+  m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('open'); });
+});
+
+// ══════════════════════════════════════════════
+// DASHBOARD — CONTROLE DE MACHOS
+// ══════════════════════════════════════════════
+function renderDashboard() {
+  var machos = db.animais.filter(function(a){ return a.sexo==='macho'; });
+  var ativos   = machos.filter(function(a){ return a.situacao==='ativo'; }).length;
+  var mortos   = machos.filter(function(a){ return a.situacao==='morte'||a.situacao==='desaparecido'; }).length;
+  var abates   = machos.filter(function(a){ return a.situacao==='abate'; }).length;
+  var vendidos = machos.filter(function(a){ return a.situacao==='vendido'; }).length;
+  var renum    = machos.filter(function(a){ return a.situacao==='renumerado'; }).length;
+  var total    = machos.filter(function(a){ return a.situacao!=='renumerado'; }).length;
+  var comRend  = machos.filter(function(a){ return a.rend; });
+  var rendMedio = comRend.length ? (comRend.reduce(function(s,a){ return s+Number(a.rend); },0)/comRend.length).toFixed(1) : '—';
+
+  var kpiEl = document.getElementById('kpi-grid');
+  if(kpiEl) kpiEl.innerHTML =
+    '<div class="kpi"><div class="kpi-label">Total Machos</div><div class="kpi-value c-straw">'+total+'</div><div class="kpi-sub">SC-27</div></div>'
+   +'<div class="kpi"><div class="kpi-label">Ativos</div><div class="kpi-value c-grass">'+ativos+'</div></div>'
+   +'<div class="kpi"><div class="kpi-label">Abatidos (W)</div><div class="kpi-value c-copper">'+abates+'</div></div>'
+   +'<div class="kpi"><div class="kpi-label">Vendidos</div><div class="kpi-value c-sky">'+vendidos+'</div></div>'
+   +'<div class="kpi"><div class="kpi-label">Mortos/Desap.</div><div class="kpi-value c-rust">'+mortos+'</div></div>'
+   +'<div class="kpi"><div class="kpi-label">Renumerados</div><div class="kpi-value c-copper">'+renum+'</div></div>'
+   +'<div class="kpi"><div class="kpi-label">Rend. Carcaça</div><div class="kpi-value c-sky">'+(rendMedio!=='—'?rendMedio+'%':rendMedio)+'</div></div>'
+   +'<div class="kpi"><div class="kpi-label">Pesagens</div><div class="kpi-value">'+db.pesagens.length+'</div></div>';
+
+  var upd = document.getElementById('dash-updated');
+  if(upd) upd.textContent='v6.0-26062026-1351 · '+new Date().toLocaleDateString('pt-BR');
+
+  // Confinamentos
+  var confList = document.getElementById('dash-conf-list');
+  if(confList) {
+    confList.innerHTML = '';
+    db.confinamentos.forEach(function(c){
+      var qtd=db.animais.filter(function(a){ return a.conf===c.id&&a.situacao==='ativo'&&a.sexo==='macho'; }).length;
+      var tot=db.animais.filter(function(a){ return a.conf===c.id&&a.sexo==='macho'; }).length;
+      confList.innerHTML+='<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border2)">'
+        +'<div><span class="badge badge-conf">'+c.nome+'</span><span style="font-size:11px;color:var(--dust);margin-left:6px">'+(c.status==='ativo'?'Em andamento':'Concluído')+'</span></div>'
+        +'<div style="font-family:DM Mono,monospace;font-size:12px"><span style="color:var(--sprout)">'+qtd+'</span><span style="color:var(--dust)">/'+tot+'</span></div></div>';
+    });
+  }
+
+  // Alertas
+  var alertBox = document.getElementById('dash-alertas');
+  if(alertBox) {
+    var proximas=db.saude.filter(function(s){ return s.proxima&&s.proxima>=today(); }).sort(function(a,b){ return a.proxima.localeCompare(b.proxima); }).slice(0,5);
+    alertBox.innerHTML=proximas.length?proximas.map(function(s){
+      return '<div class="alert alert-warn" style="margin-bottom:6px"><b>'+s.animal+'</b> — '+s.produto+' · '+fmtDate(s.proxima)+'</div>';
+    }).join(''):'<div style="color:var(--dust);font-size:12px;padding:10px 0">Nenhum alerta pendente.</div>';
+  }
+
+  // Tabela com filtros
+  var selConf=document.getElementById('dash-filtro-conf');
+  if(selConf) {
+    var confAtual=selConf.value||'todos';
+    selConf.innerHTML='<option value="todos">Todos confinamentos</option>';
+    db.confinamentos.forEach(function(c){
+      selConf.innerHTML+='<option value="'+c.id+'"'+(confAtual===c.id?' selected':'')+'>'+c.nome+'</option>';
+    });
+  }
+  var filtroSit=document.getElementById('dash-filtro-sit')?document.getElementById('dash-filtro-sit').value:'todos';
+  var filtroConf=document.getElementById('dash-filtro-conf')?document.getElementById('dash-filtro-conf').value:'todos';
+
+  var listaFiltrada;
+  if(filtroSit==='todos') listaFiltrada=machos.filter(function(a){ return a.situacao!=='renumerado'; });
+  else listaFiltrada=machos.filter(function(a){ return a.situacao===filtroSit; });
+  if(filtroConf!=='todos') listaFiltrada=listaFiltrada.filter(function(a){ return a.conf===filtroConf; });
+  listaFiltrada=listaFiltrada.sort(function(a,b){ return a._id.localeCompare(b._id,undefined,{numeric:true}); });
+
+  var tituloEl=document.getElementById('dash-tabela-titulo');
+  if(tituloEl) {
+    var sitLabel={todos:'Todos',ativo:'Ativos',abate:'Abatidos',vendido:'Vendidos',morte:'Mortos',desaparecido:'Desaparecidos',renumerado:'Renumerados'};
+    var confNome=filtroConf==='todos'?'Todos':(db.confinamentos.find(function(c){ return c.id===filtroConf; })||{nome:filtroConf}).nome;
+    tituloEl.textContent='Machos — '+(sitLabel[filtroSit]||filtroSit)+' · '+confNome+' ('+listaFiltrada.length+')';
+  }
+
+  var dpb=document.getElementById('dash-pesagens');
+  if(!dpb) return;
+  if(!listaFiltrada.length) {
+    dpb.innerHTML='<tr><td colspan="10" style="text-align:center;color:var(--dust);padding:20px">Nenhum animal encontrado</td></tr>';
+  } else {
+    var rows='';
+    for(var i=0;i<listaFiltrada.length;i++) {
+      var a=listaFiltrada[i];
+      var conf=getConf(a.conf);
+      var up=ultimoPeso(a._id);
+      var gmd='—';
+      if(up) {
+        var prev=db.pesagens.filter(function(x){ return x.animal===a._id&&x.data<up.data; }).sort(function(x,y){ return y.data.localeCompare(x.data); })[0];
+        if(prev) { var dias=(new Date(up.data)-new Date(prev.data))/86400000; if(dias>0) gmd=Math.round((up.peso-prev.peso)/dias*1000)+'g/d'; }
+      }
+      var confBadge=conf?'<span class="badge badge-conf">'+conf.nome+'</span>':'—';
+      rows+='<tr class="row-link" data-id="'+a._id+'" onclick="openDetalhe(this.getAttribute("data-id"))">'
+        +'<td class="mono" style="font-weight:600;color:var(--sprout)">'+a._id+(a.brincoAnt?'<span style="font-size:9px;color:var(--dust)"> ↺'+a.brincoAnt+'</span>':'')+'</td>'
+        +'<td style="font-size:11px;color:var(--dust)">'+fmtDate(a.nasc)+'</td>'
+        +'<td class="mono" style="font-size:11px">'+(a.mae||'—')+'</td>'
+        +'<td>'+confBadge+'</td>'
+        +'<td class="mono c-straw">'+(up?fmtN(up.peso)+' kg':'—')+'</td>'
+        +'<td style="font-size:11px;color:var(--dust)">'+(up?fmtDate(up.data):'—')+'</td>'
+        +'<td class="mono">'+(a.pesoVenda?fmtN(a.pesoVenda)+' kg':'—')+'</td>'
+        +'<td class="mono">'+(a.rend?fmtN(a.rend)+'%':'—')+'</td>'
+        +'<td>'+statusBadge(a.situacao)+'</td>'
+        +'<td style="font-size:10px;color:var(--dust);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(a.obs||'—')+'</td>'
+        +'</tr>';
+    }
+    dpb.innerHTML=rows;
+  }
+  var rodape=document.getElementById('dash-rodape');
+  if(rodape) {
+    var pesoTotal=0,comPeso=0;
+    listaFiltrada.forEach(function(a){ var up=ultimoPeso(a._id); if(up){ pesoTotal+=up.peso; comPeso++; } });
+    rodape.textContent=listaFiltrada.length+' animal(is) · Peso total: '+(pesoTotal?fmtN(pesoTotal)+' kg':'—')+' · Média: '+(comPeso?fmtN(pesoTotal/comPeso)+' kg':'—');
+  }
+}
+
+// ══════════════════════════════════════════════
+// DETALHE ANIMAL
+// ══════════════════════════════════════════════
+function openDetalhe(id) {
+  var a=getAnimal(id); if(!a) return;
+  var conf=getConf(a.conf);
+  document.getElementById('detalhe-title').textContent='Animal #'+a._id;
+  var ps=db.pesagens.filter(function(p){ return p.animal===id; }).sort(function(a,b){ return a.data.localeCompare(b.data); });
+  var saude=db.saude.filter(function(s){ return s.animal&&s.animal.split(',').map(function(x){ return x.trim(); }).indexOf(id)>=0; });
+  var pesoRows='';
+  for(var i=0;i<ps.length;i++) {
+    var p=ps[i]; var prev=ps[i-1]; var gmd='—';
+    if(prev){ var d=(new Date(p.data)-new Date(prev.data))/86400000; if(d>0) gmd=Math.round((p.peso-prev.peso)/d*1000)+'g/d'; }
+    pesoRows+='<tr><td>'+fmtDate(p.data)+'</td><td class="mono c-straw">'+fmtN(p.peso)+' kg</td><td class="mono c-grass">'+gmd+'</td><td style="font-size:11px;color:var(--dust)">'+(p.obs||'—')+'</td>'
+      +'<td><button class="btn btn-sm btn-danger" data-pid="'+p._id+'" onclick="deletePesagemBtn(this)">✕</button></td></tr>';
+  }
+  var saudeRows='';
+  for(var i=0;i<saude.length;i++) {
+    saudeRows+='<div class="tl-item"><span class="tl-date">'+fmtDate(saude[i].data)+'</span><span class="tl-type">'+(saude[i].tipo==='vacina'?'💉':'💊')+'</span><span class="tl-desc">'+saude[i].produto+'</span></div>';
+  }
+  document.getElementById('modal-detalhe-body').innerHTML=
+    '<div class="detail-grid">'
+    +'<div class="detail-item"><div class="detail-label">Brinco</div><div class="detail-value">'+a._id+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Sexo</div><div class="detail-value">'+(a.sexo==='macho'?'♂ Macho':'♀ Fêmea')+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Nascimento</div><div class="detail-value">'+fmtDate(a.nasc)+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Mãe</div><div class="detail-value">'+(a.mae||'—')+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Confinamento</div><div class="detail-value">'+(conf?conf.nome:'—')+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Situação</div><div class="detail-value">'+statusBadge(a.situacao)+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Peso Entrada</div><div class="detail-value">'+fmtN(a.pesoEntrada)+' kg</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Peso Venda</div><div class="detail-value">'+fmtN(a.pesoVenda)+' kg</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Rend. Carcaça</div><div class="detail-value">'+fmtN(a.rend)+(a.rend?'%':'')+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Brinco Anterior</div><div class="detail-value">'+(a.brincoAnt||'—')+'</div></div>'
+    +'</div>'
+    +(a.obs?'<div class="alert alert-info" style="margin-bottom:14px">'+a.obs+'</div>':'')
+    +'<div class="divider"></div>'
+    +'<div class="card-title" style="margin-bottom:10px">Pesagens ('+ps.length+')</div>'
+    +(pesoRows?'<div class="table-wrap" style="margin-bottom:14px"><table><thead><tr><th>Data</th><th>Peso</th><th>GMD</th><th>Obs.</th><th></th></tr></thead><tbody>'+pesoRows+'</tbody></table></div>':'<p style="color:var(--dust);font-size:12px;margin-bottom:14px">Nenhuma pesagem.</p>')
+    +'<div class="card-title" style="margin-bottom:10px">Saúde ('+saude.length+')</div>'
+    +(saudeRows?'<div class="timeline">'+saudeRows+'</div>':'<p style="color:var(--dust);font-size:12px">Sem registros.</p>')
+    +'<div class="form-actions" style="margin-top:16px">'
+    +'<button class="btn btn-secondary" data-id="'+a._id+'" onclick="openPesagemRapida(this.getAttribute("data-id"))">+ Pesagem</button>'
+    +'<button class="btn btn-primary" data-id="'+a._id+'" onclick="editAnimal(this.getAttribute("data-id"))">✏ Editar</button>'
+    +'</div>';
+  openModal('modal-detalhe');
+}
+function openPesagemRapida(id) {
+  closeModal('modal-detalhe');
+  openModal('modal-pesagem');
+  document.getElementById('p-animal').value=id;
+}
+
+// ══════════════════════════════════════════════
+// FÊMEAS
+// ══════════════════════════════════════════════
+function filterFemeas(f, btn) {
+  document.querySelectorAll('#filtros-femea .pill').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+  var sel=document.getElementById('fem-filtro-sit');
+  if(sel) sel.value=f;
+  renderFemeas();
+}
+
+function renderFemeas() {
+  var filtroSit=document.getElementById('fem-filtro-sit')?document.getElementById('fem-filtro-sit').value:'todas';
+  var q=(document.getElementById('search-femeas')?document.getElementById('search-femeas').value:'').toLowerCase();
+  var total=FEMEAS_DATA.length,vivas=FEMEAS_DATA.filter(function(r){ return !r[2]; }).length,mortas=FEMEAS_DATA.filter(function(r){ return r[2]; }).length,par25=FEMEAS_DATA.filter(function(r){ return r[3]; }).length,par26=FEMEAS_DATA.filter(function(r){ return r[4]; }).length,vcl=FEMEAS_DATA.filter(function(r){ return r[5]==='X'; }).length,dec=FEMEAS_DATA.filter(function(r){ return r[6]==='X'; }).length;
+  var kpiEl=document.getElementById('kpi-femeas');
+  if(kpiEl) kpiEl.innerHTML='<div class="kpi"><div class="kpi-label">Total</div><div class="kpi-value c-straw">'+total+'</div></div>'+'<div class="kpi"><div class="kpi-label">Vivas</div><div class="kpi-value c-grass">'+vivas+'</div></div>'+'<div class="kpi"><div class="kpi-label">Mortas</div><div class="kpi-value c-rust">'+mortas+'</div></div>'+'<div class="kpi"><div class="kpi-label">Pariram 2025</div><div class="kpi-value c-sky">'+par25+'</div></div>'+'<div class="kpi"><div class="kpi-label">Pariram 2026</div><div class="kpi-value c-copper">'+par26+'</div></div>'+'<div class="kpi"><div class="kpi-label">Vacina CL</div><div class="kpi-value c-grass">'+vcl+'</div><div class="kpi-sub">de '+total+'</div></div>'+'<div class="kpi"><div class="kpi-label">Dectomax</div><div class="kpi-value c-grass">'+dec+'</div><div class="kpi-sub">de '+total+'</div></div>';
+  var lista=FEMEAS_DATA.slice();
+  if(filtroSit==='vivas') lista=lista.filter(function(r){ return !r[2]; });
+  else if(filtroSit==='mortas') lista=lista.filter(function(r){ return r[2]; });
+  else if(filtroSit==='par2025') lista=lista.filter(function(r){ return r[3]; });
+  else if(filtroSit==='par2026') lista=lista.filter(function(r){ return r[4]; });
+  else if(filtroSit==='vacinacl') lista=lista.filter(function(r){ return r[5]==='X'; });
+  else if(filtroSit==='dectomax') lista=lista.filter(function(r){ return r[6]==='X'; });
+  else if(filtroSit==='semvacina') lista=lista.filter(function(r){ return r[5]!=='X'; });
+  if(q) lista=lista.filter(function(r){ return (r[0]+' '+r[3]+' '+r[4]+' '+r[7]).toLowerCase().indexOf(q)>=0; });
+  var titulos={todas:'Todas',vivas:'Vivas',mortas:'Mortas',par2025:'Pariram 2025',par2026:'Pariram 2026',vacinacl:'Vacina CL',dectomax:'Dectomax',semvacina:'Sem Vacina CL'};
+  var tEl=document.getElementById('femeas-tabela-titulo');
+  if(tEl) tEl.textContent='Fêmeas — '+(titulos[filtroSit]||filtroSit)+' ('+lista.length+')';
+  var tbody=document.getElementById('tbody-femeas');
+  if(!tbody) return;
+  if(!lista.length) { tbody.innerHTML='<tr><td colspan="8"><div class="empty"><div class="empty-icon">♀</div><div class="empty-text">Nenhuma fêmea encontrada</div></div></td></tr>'; return; }
+  var chk='<span style="color:var(--sprout);font-size:14px">✓</span>',crs='<span style="color:var(--border)">—</span>',rows='';
+  for(var i=0;i<lista.length;i++) {
+    var r=lista[i],num=r[0],nasc=r[1],morte=r[2],p25=r[3],p26=r[4],vc=r[5],dc=r[6],obs=r[7];
+    var femId='F'+String(num).padStart(3,'0'),morta=!!morte;
+    var rowBg=morta?'background:rgba(158,61,42,0.08);border-left:3px solid rgba(158,61,42,0.35)':'';
+    rows+='<tr style="'+rowBg+'" class="row-link" data-femid="'+femId+'" data-num="'+num+'" onclick="openDetalheFemea(this.getAttribute("data-femid"),parseInt(this.getAttribute("data-num")))">'
+      +'<td class="mono" style="font-weight:600;color:'+(morta?'var(--rust)':'var(--sprout)')+'">'+femId+'</td>'
+      +'<td style="font-size:11px;color:var(--dust)">'+(nasc||'—')+'</td>'
+      +'<td style="font-size:11px;color:'+(morta?'var(--rust)':'var(--border)')+';">'+(morte||'—')+'</td>'
+      +'<td style="font-size:11px">'+(p25||'—')+'</td>'
+      +'<td style="font-size:11px;color:var(--straw)">'+(p26||'—')+'</td>'
+      +'<td style="text-align:center">'+(vc==='X'?chk:crs)+'</td>'
+      +'<td style="text-align:center">'+(dc==='X'?chk:crs)+'</td>'
+      +'<td style="font-size:11px;color:var(--dust);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(obs||'—')+'</td>'
+      +'</tr>';
+  }
+  tbody.innerHTML=rows;
+  var rodEl=document.getElementById('femeas-rodape');
+  if(rodEl) rodEl.textContent=lista.length+' fêmea(s) exibida(s)';
+}
+
+function openDetalheFemea(femId, num) {
+  var rowData=FEMEAS_DATA.find(function(r){ return r[0]===num; });
+  var a=getAnimal(femId);
+  var paricoes=(db.paricoes||[]).filter(function(p){ return p.mae===femId; }).sort(function(a,b){ return b.data.localeCompare(a.data); });
+  var filhos=db.animais.filter(function(f){ return f.mae===femId; });
+  var saude=db.saude.filter(function(s){ return s.animal&&s.animal.split(',').map(function(x){ return x.trim(); }).indexOf(femId)>=0; });
+  var nasc='',morte='',p25='',p26='',vcl='',dec='',obs='';
+  if(rowData){ nasc=rowData[1];morte=rowData[2];p25=rowData[3];p26=rowData[4];vcl=rowData[5];dec=rowData[6];obs=rowData[7]; }
+  document.getElementById('detalhe-title').textContent='Fêmea '+femId;
+  var parRows='';
+  for(var i=0;i<paricoes.length;i++) {
+    var p=paricoes[i];
+    parRows+='<tr><td>'+fmtDate(p.data)+'</td><td class="mono" style="text-align:center">'+(p.machos||0)+'</td><td class="mono" style="text-align:center">'+(p.femeas||0)+'</td><td style="font-size:11px">'+(p.filhos||'—')+'</td><td class="mono" style="font-size:11px">'+(p.pai||'—')+'</td><td style="font-size:11px;color:var(--dust)">'+(p.obs||'—')+'</td>'
+      +'<td><button class="btn btn-sm btn-danger" data-pid="'+p._id+'" onclick="deleteParicaoBtn(this)">✕</button></td></tr>';
+  }
+  var filhoTags='';
+  for(var i=0;i<filhos.length;i++) filhoTags+='<span class="badge '+(filhos[i].sexo==='macho'?'badge-macho':'badge-femea')+'">'+filhos[i]._id+'</span>';
+  var saudeRows='';
+  for(var i=0;i<saude.length;i++) saudeRows+='<div class="tl-item"><span class="tl-date">'+fmtDate(saude[i].data)+'</span><span class="tl-type">'+(saude[i].tipo==='vacina'?'💉':'💊')+'</span><span class="tl-desc">'+saude[i].produto+'</span></div>';
+  document.getElementById('modal-detalhe-body').innerHTML=
+    '<div class="detail-grid">'
+    +'<div class="detail-item"><div class="detail-label">Brinco</div><div class="detail-value">'+femId+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Nascimento</div><div class="detail-value">'+(nasc||'—')+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Morte</div><div class="detail-value" style="color:'+(morte?'var(--rust)':'var(--dust)')+';">'+(morte||'—')+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Vacina CL</div><div class="detail-value">'+(vcl==='X'?'<span style="color:var(--sprout)">✓ Sim</span>':'—')+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Dectomax</div><div class="detail-value">'+(dec==='X'?'<span style="color:var(--sprout)">✓ Sim</span>':'—')+'</div></div>'
+    +'<div class="detail-item"><div class="detail-label">Filhos</div><div class="detail-value c-grass">'+filhos.length+'</div></div>'
+    +'</div>'
+    +(obs?'<div class="alert alert-info" style="margin-bottom:14px">'+obs+'</div>':'')
+    +'<div class="divider"></div>'
+    +'<div class="card-title" style="margin-bottom:8px">Parições (PDF)</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'
+    +'<div class="card" style="padding:12px"><div class="detail-label" style="margin-bottom:4px">2025</div><div style="font-size:12px">'+(p25||'Sem registro')+'</div></div>'
+    +'<div class="card" style="padding:12px"><div class="detail-label" style="margin-bottom:4px">2026</div><div style="font-size:12px;color:var(--straw)">'+(p26||'Sem registro')+'</div></div>'
+    +'</div>'
+    +(paricoes.length?'<div class="card-title" style="margin-bottom:8px">Parições Registradas ('+paricoes.length+')</div><div class="table-wrap" style="margin-bottom:14px"><table><thead><tr><th>Data</th><th>M</th><th>F</th><th>Filhos</th><th>Pai</th><th>Obs.</th><th></th></tr></thead><tbody>'+parRows+'</tbody></table></div>':'')
+    +'<div class="card-title" style="margin-bottom:8px">Filhos ('+filhos.length+')</div>'
+    +(filhoTags?'<div class="tag-list" style="margin-bottom:14px">'+filhoTags+'</div>':'<p style="color:var(--dust);font-size:12px;margin-bottom:14px">Nenhum filho cadastrado.</p>')
+    +'<div class="card-title" style="margin-bottom:8px">Saúde ('+saude.length+')</div>'
+    +(saudeRows?'<div class="timeline">'+saudeRows+'</div>':'<p style="color:var(--dust);font-size:12px">Sem registros.</p>')
+    +'<div class="form-actions" style="margin-top:16px">'
+    +'<button class="btn btn-secondary" data-fid="'+femId+'" onclick="openParicaoRapida(this.getAttribute("data-fid"))">+ Parição</button>'
+    +(a?'<button class="btn btn-primary" data-fid="\'+femId+\'" onclick="editFemeaBtn(this)">✏ Editar</button>':'');
+    +'</div>';
+  openModal('modal-detalhe');
+}
+
+function editFemeaBtn(btn){closeModal('modal-detalhe');editAnimal(btn.getAttribute('data-fid'));}
+function openParicaoRapida(femId) {
+  closeModal('modal-detalhe');
+  openModal('modal-paricao');
+  setTimeout(function(){ var sel=document.getElementById('par-mae'); if(sel) sel.value=femId; document.getElementById('par-data').value=today(); },50);
+}
+
+async function saveParicao() {
+  var mae=document.getElementById('par-mae').value,data=document.getElementById('par-data').value;
+  if(!mae||!data){ toast('Informe a mãe e a data',true); return; }
+  if(!db.paricoes) db.paricoes=[];
+  var filhosStr=document.getElementById('par-filhos').value.trim();
+  var par={_id:uid(),mae:mae,data:data,machos:parseInt(document.getElementById('par-machos').value)||0,femeas:parseInt(document.getElementById('par-femeas').value)||0,filhos:filhosStr,pai:document.getElementById('par-pai').value.trim(),obs:document.getElementById('par-obs').value.trim(),_ts:Date.now()};
+  db.paricoes.push(par);
+  await salvarParicaoSB(par);
+  if(filhosStr) {
+    var brincos=filhosStr.split(',').map(function(b){ return b.trim(); }).filter(Boolean);
+    var cadastrados=0;
+    for(var i=0;i<brincos.length;i++) {
+      var brinco=brincos[i];
+      if(!db.animais.find(function(a){ return a._id===brinco; })) {
+        var sexo=brinco.startsWith('M')?'macho':'femea';
+        var novoAnimal={_id:brinco,id:brinco,sexo:sexo,nasc:data,mae:mae,pai:'',raca:'',conf:'',situacao:'ativo',pesoEntrada:null,pesoVenda:null,rend:null,brincoAnt:'',obs:'',_ts:Date.now()};
+        db.animais.push(novoAnimal);
+        await salvarAnimalSB(novoAnimal);
+        cadastrados++;
+      }
+    }
+    toast('Parição + '+cadastrados+' filho(s) ✓');
+  } else { toast('Parição registrada ✓'); }
+  saveDB(db); closeModal('modal-paricao'); renderFemeas(); renderDashboard();
+}
+
+function deleteParicao(id) {
+  if(!confirm('Remover parição?')) return;
+  db.paricoes=(db.paricoes||[]).filter(function(p){ return p._id!==id; });
+  saveDB(db); toast('Removida');
+  if(modoOnline) sbDelete('paricoes', id);
+}
+function deleteParicaoBtn(btn) { deleteParicao(btn.getAttribute("data-pid")); }
+
+// ══════════════════════════════════════════════
+// ANIMAIS CRUD
+// ══════════════════════════════════════════════
+async function saveAnimal() {
+  var brinco=document.getElementById('a-brinco').value.trim();
+  if(!brinco){ toast('Informe o nº do brinco',true); return; }
+  var editId=document.getElementById('animal-id-edit').value;
+  if(!editId&&db.animais.find(function(a){ return a._id===brinco; })){ toast('Brinco já cadastrado!',true); return; }
+  var obj={_id:brinco,id:brinco,sexo:document.getElementById('a-sexo').value,nasc:document.getElementById('a-nasc').value,mae:document.getElementById('a-mae').value.trim(),pai:document.getElementById('a-pai').value.trim(),raca:document.getElementById('a-raca').value.trim(),conf:document.getElementById('a-conf').value,situacao:document.getElementById('a-situacao').value,pesoEntrada:document.getElementById('a-peso-entrada').value||null,pesoVenda:document.getElementById('a-peso-venda').value||null,rend:document.getElementById('a-rend').value||null,brincoAnt:document.getElementById('a-brinco-ant').value.trim(),obs:document.getElementById('a-obs').value.trim(),_ts:Date.now()};
+  if(editId){ var idx=db.animais.findIndex(function(a){ return a._id===editId; }); if(idx>=0) db.animais[idx]=Object.assign({},db.animais[idx],obj,{_id:editId,id:editId}); }
+  else db.animais.push(obj);
+  await salvarAnimalSB(obj);
+  saveDB(db); closeModal('modal-animal'); document.getElementById('animal-id-edit').value='';
+  renderDashboard(); toast('Animal salvo ✓');
+}
+function editAnimal(id) {
+  var a=getAnimal(id); if(!a) return;
+  openModal('modal-animal');
+  document.getElementById('modal-animal-title').textContent='Editar #'+id;
+  document.getElementById('animal-id-edit').value=id;
+  document.getElementById('a-brinco').value=a._id;
+  document.getElementById('a-sexo').value=a.sexo;
+  document.getElementById('a-nasc').value=a.nasc||'';
+  document.getElementById('a-mae').value=a.mae||'';
+  document.getElementById('a-pai').value=a.pai||'';
+  document.getElementById('a-raca').value=a.raca||'';
+  document.getElementById('a-conf').value=a.conf||'';
+  document.getElementById('a-situacao').value=a.situacao;
+  document.getElementById('a-peso-entrada').value=a.pesoEntrada||'';
+  document.getElementById('a-peso-venda').value=a.pesoVenda||'';
+  document.getElementById('a-rend').value=a.rend||'';
+  document.getElementById('a-brinco-ant').value=a.brincoAnt||'';
+  document.getElementById('a-obs').value=a.obs||'';
+}
+async function deleteAnimal(id) {
+  if(!confirm('Remover animal #'+id+'?')) return;
+  db.animais=db.animais.filter(function(a){ return a._id!==id; });
+  db.pesagens=db.pesagens.filter(function(p){ return p.animal!==id; });
+  await deletarAnimalSB(id);
+  saveDB(db); renderDashboard(); toast('Animal removido');
+}
+
+// ══════════════════════════════════════════════
+// PESAGENS
+// ══════════════════════════════════════════════
+function renderPesagens() {
+  var q=(document.getElementById('search-pesagens')?document.getElementById('search-pesagens').value:'').toLowerCase();
+  var lista=[].concat(db.pesagens).sort(function(a,b){ return b.data.localeCompare(a.data); });
+  if(q) lista=lista.filter(function(p){ return p.animal.toLowerCase().indexOf(q)>=0; });
+  var tbody=document.getElementById('tbody-pesagens'); if(!tbody) return;
+  if(!lista.length){ tbody.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-icon">⚖</div><div class="empty-text">Nenhuma pesagem</div></div></td></tr>'; return; }
+  var rows='';
+  for(var i=0;i<lista.length;i++) {
+    var p=lista[i];
+    var prev=db.pesagens.filter(function(x){ return x.animal===p.animal&&x.data<p.data; }).sort(function(a,b){ return b.data.localeCompare(a.data); })[0];
+    var gmd='—'; if(prev){ var d=(new Date(p.data)-new Date(prev.data))/86400000; if(d>0) gmd=Math.round((p.peso-prev.peso)/d*1000)+'g/d'; }
+    rows+='<tr><td class="mono" style="font-weight:600">'+p.animal+'</td><td>'+fmtDate(p.data)+'</td><td class="mono c-straw">'+fmtN(p.peso)+' kg</td><td class="mono c-grass">'+gmd+'</td><td style="font-size:11px;color:var(--dust)">'+(p.obs||'—')+'</td>'
+      +'<td><button class="btn btn-sm btn-danger" data-pid="'+p._id+'" onclick="deletePesagemBtn(this)">✕</button></td></tr>';
+  }
+  tbody.innerHTML=rows;
+}
+async function savePesagem() {
+  var animal=document.getElementById('p-animal').value.trim(),data=document.getElementById('p-data').value,peso=parseFloat(document.getElementById('p-peso').value);
+  if(!animal||!data||isNaN(peso)){ toast('Preencha todos os campos',true); return; }
+  var p={_id:uid(),animal:animal,data:data,peso:peso,obs:document.getElementById('p-obs').value.trim(),_ts:Date.now()};
+  db.pesagens.push(p);
+  await salvarPesagemSB(p);
+  saveDB(db); closeModal('modal-pesagem'); renderPesagens(); renderDashboard(); toast('Pesagem salva ✓');
+}
+async function deletePesagemBtn(btn) {
+  if(!confirm('Remover pesagem?')) return;
+  var id=btn.getAttribute("data-pid");
+  db.pesagens=db.pesagens.filter(function(p){ return p._id!==id; });
+  await deletarPesagemSB(id);
+  saveDB(db); renderPesagens(); toast('Removida');
+}
+
+// ══════════════════════════════════════════════
+// SAÚDE
+// ══════════════════════════════════════════════
+var filtroSaude='todos';
+function filterSaude(f,btn){ filtroSaude=f; document.querySelectorAll('#page-saude .pill').forEach(function(p){ p.classList.remove('active'); }); btn.classList.add('active'); renderSaude(); }
+function renderSaude() {
+  var lista=[].concat(db.saude).sort(function(a,b){ return b.data.localeCompare(a.data); });
+  if(filtroSaude!=='todos') lista=lista.filter(function(s){ return s.tipo===filtroSaude; });
+  var tbody=document.getElementById('tbody-saude'); if(!tbody) return;
+  if(!lista.length){ tbody.innerHTML='<tr><td colspan="9"><div class="empty"><div class="empty-icon">💉</div><div class="empty-text">Nenhum registro</div></div></td></tr>'; return; }
+  var rows='';
+  for(var i=0;i<lista.length;i++) {
+    var s=lista[i];
+    rows+='<tr><td class="mono">'+s.animal+'</td><td>'+(s.tipo==='vacina'?'💉 Vacina':'💊 Med.')+'</td><td>'+fmtDate(s.data)+'</td><td>'+s.produto+'</td><td style="font-size:11px">'+(s.dose||'—')+' / '+(s.via||'—')+'</td><td style="font-size:11px;color:'+(s.proxima&&s.proxima<=today()?'var(--rust)':'var(--dust)')+';">'+fmtDate(s.proxima)+'</td><td style="font-size:11px">'+(s.resp||'—')+'</td><td style="font-size:11px;color:var(--dust)">'+(s.obs||'—')+'</td><td><button class="btn btn-sm btn-danger" data-sid="'+s._id+'" onclick="deleteSaudeBtn(this)">✕</button></td></tr>';
+  }
+  tbody.innerHTML=rows;
+}
+async function saveVacina() {
+  var animal=document.getElementById('v-animal').value.trim(),data=document.getElementById('v-data').value,produto=document.getElementById('v-produto').value.trim();
+  if(!animal||!data||!produto){ toast('Preencha os campos obrigatórios',true); return; }
+  var s={_id:uid(),tipo:'vacina',animal:animal,data:data,produto:produto,dose:document.getElementById('v-dose').value,via:document.getElementById('v-via').value,proxima:document.getElementById('v-proxima').value,resp:document.getElementById('v-resp').value,obs:document.getElementById('v-obs').value,_ts:Date.now()};
+  db.saude.push(s);
+  if(modoOnline) await sbUpsert('saude',[{id:s._id,animal:s.animal,tipo:s.tipo,data:s.data,produto:s.produto,dose:s.dose||null,via:s.via||null,proxima:s.proxima||null,resp:s.resp||null,obs:s.obs||null}]);
+  else addPendente('upsert','saude',{id:s._id,animal:s.animal,tipo:s.tipo,data:s.data,produto:s.produto,dose:s.dose||null,via:s.via||null,proxima:s.proxima||null,resp:s.resp||null,obs:s.obs||null});
+  saveDB(db); closeModal('modal-vacina'); renderSaude(); toast('Vacina registrada ✓');
+}
+async function saveMed() {
+  var animal=document.getElementById('m-animal').value.trim(),data=document.getElementById('m-data').value,produto=document.getElementById('m-produto').value.trim();
+  if(!animal||!data||!produto){ toast('Preencha os campos obrigatórios',true); return; }
+  var s={_id:uid(),tipo:'medicacao',animal:animal,data:data,produto:produto,dose:document.getElementById('m-dose').value,via:document.getElementById('m-via').value,proxima:document.getElementById('m-proxima').value,motivo:document.getElementById('m-motivo').value,resp:document.getElementById('m-resp').value,obs:document.getElementById('m-obs').value,_ts:Date.now()};
+  db.saude.push(s);
+  if(modoOnline) await sbUpsert('saude',[{id:s._id,animal:s.animal,tipo:s.tipo,data:s.data,produto:s.produto,dose:s.dose||null,via:s.via||null,proxima:s.proxima||null,motivo:s.motivo||null,resp:s.resp||null,obs:s.obs||null}]);
+  else addPendente('upsert','saude',{id:s._id,animal:s.animal,tipo:s.tipo,data:s.data,produto:s.produto,dose:s.dose||null,via:s.via||null,proxima:s.proxima||null,motivo:s.motivo||null,resp:s.resp||null,obs:s.obs||null});
+  saveDB(db); closeModal('modal-med'); renderSaude(); toast('Medicação registrada ✓');
+}
+function deleteSaudeBtn(btn) {
+  if(!confirm('Remover?')) return;
+  var id=btn.getAttribute("data-sid");
+  db.saude=db.saude.filter(function(s){ return s._id!==id; });
+  if(modoOnline) sbDelete('saude',id);
+  saveDB(db); renderSaude();
+}
+
+// ══════════════════════════════════════════════
+// MANEJO
+// ══════════════════════════════════════════════
+var filtroManejo='todos';
+function filterManejo(f,btn){ filtroManejo=f; document.querySelectorAll('#page-manejo .pill').forEach(function(p){ p.classList.remove('active'); }); btn.classList.add('active'); renderManejo(); }
+function renderManejo() {
+  var lista=[].concat(db.manejo).sort(function(a,b){ return b.data.localeCompare(a.data); });
+  if(filtroManejo!=='todos') lista=lista.filter(function(m){ return m.tipo===filtroManejo; });
+  var tbody=document.getElementById('tbody-manejo'); if(!tbody) return;
+  if(!lista.length){ tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">🏠</div><div class="empty-text">Nenhum registro</div></div></td></tr>'; return; }
+  var rows='';
+  for(var i=0;i<lista.length;i++) {
+    var m=lista[i];
+    rows+='<tr><td class="mono">'+m.animal+'</td><td><span class="badge badge-conf">'+m.tipo+'</span></td><td>'+fmtDate(m.data)+'</td><td style="font-size:12px">'+(m.detalhe||'—')+'</td><td style="font-size:11px">'+(m.resp||'—')+'</td><td style="font-size:11px;color:var(--dust)">'+(m.obs||'—')+'</td><td><button class="btn btn-sm btn-danger" data-mid="'+m._id+'" onclick="deleteManejoBtn(this)">✕</button></td></tr>';
+  }
+  tbody.innerHTML=rows;
+}
+async function saveManejo() {
+  var animal=document.getElementById('mj-animal').value.trim(),data=document.getElementById('mj-data').value;
+  if(!animal||!data){ toast('Preencha os campos obrigatórios',true); return; }
+  var m={_id:uid(),animal:animal,data:data,tipo:document.getElementById('mj-tipo').value,detalhe:document.getElementById('mj-detalhe').value,resp:document.getElementById('mj-resp').value,obs:document.getElementById('mj-obs').value,_ts:Date.now()};
+  db.manejo.push(m);
+  if(modoOnline) await sbUpsert('manejo',[{id:m._id,animal:m.animal,tipo:m.tipo,data:m.data,detalhe:m.detalhe||null,resp:m.resp||null,obs:m.obs||null}]);
+  else addPendente('upsert','manejo',{id:m._id,animal:m.animal,tipo:m.tipo,data:m.data,detalhe:m.detalhe||null,resp:m.resp||null,obs:m.obs||null});
+  saveDB(db); closeModal('modal-manejo'); renderManejo(); toast('Manejo registrado ✓');
+}
+function deleteManejoBtn(btn) {
+  if(!confirm('Remover?')) return;
+  var id=btn.getAttribute("data-mid");
+  db.manejo=db.manejo.filter(function(m){ return m._id!==id; });
+  if(modoOnline) sbDelete('manejo',id);
+  saveDB(db); renderManejo();
+}
+
+// ══════════════════════════════════════════════
+// CONFINAMENTOS
+// ══════════════════════════════════════════════
+function renderConfs() {
+  var box=document.getElementById('conf-cards'); if(!box) return;
+  if(!db.confinamentos.length){ box.innerHTML='<div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Nenhum confinamento</div></div>'; return; }
+  var html='';
+  for(var ci=0;ci<db.confinamentos.length;ci++) {
+    var c=db.confinamentos[ci];
+    var ativos=db.animais.filter(function(a){ return a.conf===c.id&&a.situacao==='ativo'&&a.sexo==='macho'; });
+    var todos=db.animais.filter(function(a){ return a.conf===c.id&&a.sexo==='macho'; });
+    var pt=0; ativos.forEach(function(a){ var up=ultimoPeso(a._id); if(up) pt+=up.peso; });
+    var pm=ativos.length?pt/ativos.length:null;
+    var mortos=todos.filter(function(a){ return a.situacao==='morte'||a.situacao==='desaparecido'; }).length;
+    var saidas=todos.filter(function(a){ return a.situacao==='vendido'||a.situacao==='abate'; }).length;
+    var tagList='';
+    for(var ai=0;ai<ativos.length;ai++) tagList+='<span class="badge badge-active" style="cursor:pointer" data-id="'+ativos[ai]._id+'" onclick="openDetalhe(this.getAttribute("data-id"))">'+ativos[ai]._id+'</span>';
+    html+='<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="display:flex;align-items:center;gap:10px"><span class="badge badge-conf" style="font-size:12px;padding:4px 10px">'+c.nome+'</span><span class="badge '+(c.status==='ativo'?'badge-active':'badge-gone')+'">'+(c.status==='ativo'?'Em andamento':'Concluído')+'</span></div><div style="display:flex;gap:6px"><button class="btn btn-sm btn-secondary" data-cid="'+c.id+'" onclick="editConf(this.getAttribute("data-cid"))">✏</button><button class="btn btn-sm btn-danger" data-cid="'+c.id+'" onclick="deleteConfBtn(this)">✕</button></div></div>'
+      +'<div class="detail-grid" style="margin-bottom:12px"><div class="detail-item"><div class="detail-label">Início</div><div class="detail-value">'+fmtDate(c.inicio)+'</div></div><div class="detail-item"><div class="detail-label">Fim</div><div class="detail-value">'+fmtDate(c.fim)+'</div></div><div class="detail-item"><div class="detail-label">Ativos</div><div class="detail-value c-grass">'+ativos.length+'</div></div><div class="detail-item"><div class="detail-label">Total lote</div><div class="detail-value">'+todos.length+'</div></div><div class="detail-item"><div class="detail-label">Mortes</div><div class="detail-value c-rust">'+mortos+'</div></div><div class="detail-item"><div class="detail-label">Saídas</div><div class="detail-value c-sky">'+saidas+'</div></div><div class="detail-item"><div class="detail-label">Peso Médio</div><div class="detail-value c-straw">'+(pm?fmtN(pm)+' kg':'—')+'</div></div><div class="detail-item"><div class="detail-label">Peso Total</div><div class="detail-value">'+(pt?fmtN(pt)+' kg':'—')+'</div></div></div>'
+      +(c.obs?'<div style="font-size:11px;color:var(--dust)">'+c.obs+'</div>':'')
+      +(ativos.length?'<div class="divider"></div><div style="font-size:11px;color:var(--dust);margin-bottom:6px">Machos ativos:</div><div class="tag-list">'+tagList+'</div>':'')
+      +'</div>';
+  }
+  box.innerHTML=html;
+}
+async function saveConf() {
+  var nome=document.getElementById('cf-nome').value.trim();
+  if(!nome){ toast('Informe o nome',true); return; }
+  var editId=document.getElementById('conf-id-edit').value;
+  var obj={id:editId||'C'+Date.now(),nome:nome,inicio:document.getElementById('cf-inicio').value,fim:document.getElementById('cf-fim').value,local:document.getElementById('cf-local').value.trim(),status:document.getElementById('cf-status').value,obs:document.getElementById('cf-obs').value.trim()};
+  if(editId){ var idx=db.confinamentos.findIndex(function(c){ return c.id===editId; }); if(idx>=0) db.confinamentos[idx]=obj; } else db.confinamentos.push(obj);
+  if(modoOnline) await sbUpsert('confinamentos',[{id:obj.id,nome:obj.nome,inicio:obj.inicio||null,fim:obj.fim||null,local:obj.local||null,status:obj.status,obs:obj.obs||null}]);
+  saveDB(db); closeModal('modal-conf'); document.getElementById('conf-id-edit').value=''; renderConfs(); toast('Confinamento salvo ✓');
+}
+function editConf(id) {
+  var c=getConf(id); if(!c) return;
+  openModal('modal-conf');
+  document.getElementById('modal-conf-title').textContent='Editar '+c.nome;
+  document.getElementById('conf-id-edit').value=c.id;
+  document.getElementById('cf-nome').value=c.nome;
+  document.getElementById('cf-inicio').value=c.inicio||'';
+  document.getElementById('cf-fim').value=c.fim||'';
+  document.getElementById('cf-local').value=c.local||'';
+  document.getElementById('cf-status').value=c.status;
+  document.getElementById('cf-obs').value=c.obs||'';
+}
+function deleteConfBtn(btn) {
+  if(!confirm('Remover confinamento?')) return;
+  db.confinamentos=db.confinamentos.filter(function(c){ return c.id!==btn.getAttribute("data-cid"); });
+  saveDB(db); renderConfs(); toast('Removido');
+}
+
+// ══════════════════════════════════════════════
+// RESET E EXPORT
+// ══════════════════════════════════════════════
+function resetSistema() {
+  if(!confirm('Recarregar todos os dados?\nDados locais não sincronizados serão perdidos.')) return;
+  localStorage.removeItem(DB_KEY);
+  location.reload();
+}
+function exportData() {
+  var blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download='ovinos_sc27_'+today()+'.json'; a.click(); URL.revokeObjectURL(url); toast('Exportado ✓');
+}
+function openImport(){ openModal('modal-import'); }
+function importData() {
+  var raw=document.getElementById('import-json').value.trim();
+  try{ var parsed=JSON.parse(raw); if(!parsed.animais) throw new Error('JSON inválido'); db=parsed; saveDB(db); closeModal('modal-import'); renderDashboard(); toast('Importado ✓'); }
+  catch(e){ toast('Erro: '+e.message,true); }
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+seedSC27().then(function() {
+  renderDashboard();
+  // Sincroniza a cada 30 segundos se online
+  setInterval(function() {
+    if(modoOnline && db._pendente && db._pendente.length > 0) {
+      sincronizar();
+    }
+  }, 30000);
+});
+</script>
+</body>
+</html>
