@@ -1948,13 +1948,67 @@ function filterFemeas(f, btn) {
   renderFemeas();
 }
 
+function getFemeasCompleto() {
+  // Pega todas as fêmeas: PDF + cadastradas no banco
+  var lista = FEMEAS_DATA.map(function(r){ return r.slice(); }); // clone
+  var idsPDF = new Set(FEMEAS_DATA.map(function(r){ return r[0]; }));
+
+  // Adiciona fêmeas do banco que NÃO estão no PDF
+  db.animais.forEach(function(a){
+    if(a.sexo!=='femea') return;
+    var numStr = a._id.replace(/^F/,'').replace(/^0+/,'');
+    var num = parseInt(numStr);
+    if(isNaN(num)) return;
+    if(idsPDF.has(num)) return; // já está no PDF
+    // Converte data do banco (YYYY-MM-DD) para DD/MM/YYYY
+    var nascFmt = '';
+    if(a.nasc) {
+      var p = a.nasc.split('-');
+      if(p.length===3) nascFmt = p[2]+'/'+p[1]+'/'+p[0];
+    }
+    // Verifica parições registradas para essa fêmea em 2025/2026
+    var paricoes2025 = (db.paricoes||[]).filter(function(p){ return p.mae===a._id && p.data && p.data.startsWith('2025'); });
+    var paricoes2026 = (db.paricoes||[]).filter(function(p){ return p.mae===a._id && p.data && p.data.startsWith('2026'); });
+    var p25Str = paricoes2025.map(function(p){
+      var pp=p.data.split('-');
+      return pp[2]+'/'+pp[1]+'/'+pp[0]+(p.filhos?' ('+p.filhos+')':'');
+    }).join('; ');
+    var p26Str = paricoes2026.map(function(p){
+      var pp=p.data.split('-');
+      return pp[2]+'/'+pp[1]+'/'+pp[0]+(p.filhos?' ('+p.filhos+')':'');
+    }).join('; ');
+    lista.push([num, nascFmt, '', p25Str, p26Str, '', '', a.obs||'']);
+  });
+
+  // Também enriquece fêmeas do PDF com parições do banco
+  lista.forEach(function(row){
+    var num = row[0];
+    var femId = 'F'+String(num).padStart(3,'0');
+    var paricoes2026 = (db.paricoes||[]).filter(function(p){ return p.mae===femId && p.data && p.data.startsWith('2026'); });
+    if(paricoes2026.length > 0) {
+      var novoP26 = paricoes2026.map(function(p){
+        var pp=p.data.split('-');
+        return pp[2]+'/'+pp[1]+'/'+pp[0]+(p.filhos?' ('+p.filhos+')':'');
+      }).join('; ');
+      if(!row[4] || row[4].indexOf(novoP26.split(' ')[0]) < 0) {
+        row[4] = row[4] ? row[4] + '; ' + novoP26 : novoP26;
+      }
+    }
+  });
+
+  // Ordena por número
+  lista.sort(function(a,b){ return a[0]-b[0]; });
+  return lista;
+}
+
 function renderFemeas() {
+  var femeasFull = getFemeasCompleto();
   var filtroSit=document.getElementById('fem-filtro-sit')?document.getElementById('fem-filtro-sit').value:'todas';
   var q=(document.getElementById('search-femeas')?document.getElementById('search-femeas').value:'').toLowerCase();
-  var total=FEMEAS_DATA.length,vivas=FEMEAS_DATA.filter(function(r){ return !r[2]; }).length,mortas=FEMEAS_DATA.filter(function(r){ return r[2]; }).length,par25=FEMEAS_DATA.filter(function(r){ return r[3]; }).length,par26=FEMEAS_DATA.filter(function(r){ return r[4]; }).length,vcl=FEMEAS_DATA.filter(function(r){ return r[5]==='X'; }).length,dec=FEMEAS_DATA.filter(function(r){ return r[6]==='X'; }).length;
+  var total=femeasFull.length,vivas=femeasFull.filter(function(r){ return !r[2]; }).length,mortas=femeasFull.filter(function(r){ return r[2]; }).length,par25=femeasFull.filter(function(r){ return r[3]; }).length,par26=femeasFull.filter(function(r){ return r[4]; }).length,vcl=femeasFull.filter(function(r){ return r[5]==='X'; }).length,dec=femeasFull.filter(function(r){ return r[6]==='X'; }).length;
   var kpiEl=document.getElementById('kpi-femeas');
   if(kpiEl) kpiEl.innerHTML='<div class="kpi"><div class="kpi-label">Total</div><div class="kpi-value c-straw">'+total+'</div></div>'+'<div class="kpi"><div class="kpi-label">Vivas</div><div class="kpi-value c-grass">'+vivas+'</div></div>'+'<div class="kpi"><div class="kpi-label">Mortas</div><div class="kpi-value c-rust">'+mortas+'</div></div>'+'<div class="kpi"><div class="kpi-label">Pariram 2025</div><div class="kpi-value c-sky">'+par25+'</div></div>'+'<div class="kpi"><div class="kpi-label">Pariram 2026</div><div class="kpi-value c-copper">'+par26+'</div></div>'+'<div class="kpi"><div class="kpi-label">Vacina CL</div><div class="kpi-value c-grass">'+vcl+'</div><div class="kpi-sub">de '+total+'</div></div>'+'<div class="kpi"><div class="kpi-label">Dectomax</div><div class="kpi-value c-grass">'+dec+'</div><div class="kpi-sub">de '+total+'</div></div>';
-  var lista=FEMEAS_DATA.slice();
+  var lista=femeasFull.slice();
   if(filtroSit==='vivas') lista=lista.filter(function(r){ return !r[2]; });
   else if(filtroSit==='mortas') lista=lista.filter(function(r){ return r[2]; });
   else if(filtroSit==='par2025') lista=lista.filter(function(r){ return r[3]; });
