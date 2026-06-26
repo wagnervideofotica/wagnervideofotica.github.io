@@ -517,11 +517,13 @@ select option { background: var(--wood); }
     <div class="brand-icon">🐑</div>
     <div>
       <div class="brand-name">OVINOS <span class="brand-sub">· SC-27</span></div>
+      <div id="status-online" style="font-size:10px;margin-top:2px">⏳ Conectando...</div>
     </div>
   </div>
   <div class="topbar-right">
     <button class="btn-icon" onclick="exportData()">⬇ Exportar</button>
     <button class="btn-icon" onclick="openImport()">⬆ Importar</button>
+    <button class="btn-icon" onclick="sincronizar()" style="color:var(--sprout)">⟳ Sync</button>
     <button class="btn-icon" onclick="resetSistema()" style="background:rgba(158,61,42,0.3);color:#e07060;border-color:rgba(158,61,42,0.4)" title="Recarregar dados do sistema">↺ Reset</button>
   </div>
 </div>
