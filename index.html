@@ -1966,6 +1966,20 @@ function getFemeasCompleto() {
       var p = a.nasc.split('-');
       if(p.length===3) nascFmt = p[2]+'/'+p[1]+'/'+p[0];
     }
+    // Se não tem nascimento, busca da parição onde ela é filho
+    var obsAnimal = a.obs || '';
+    if(!nascFmt || !obsAnimal) {
+      var paricoesMae = (db.paricoes||[]).find(function(p){ 
+        return p.filhos && p.filhos.split(',').map(function(x){return x.trim();}).indexOf(a._id) >= 0;
+      });
+      if(paricoesMae) {
+        if(!nascFmt && paricoesMae.data) {
+          var pp = paricoesMae.data.split('-');
+          if(pp.length===3) nascFmt = pp[2]+'/'+pp[1]+'/'+pp[0];
+        }
+        if(!obsAnimal) obsAnimal = (a.sexo==='femea'?'Filha':'Filho')+' de '+paricoesMae.mae;
+      }
+    }
     // Verifica parições registradas para essa fêmea em 2025/2026
     var paricoes2025 = (db.paricoes||[]).filter(function(p){ return p.mae===a._id && p.data && p.data.startsWith('2025'); });
     var paricoes2026 = (db.paricoes||[]).filter(function(p){ return p.mae===a._id && p.data && p.data.startsWith('2026'); });
@@ -1977,7 +1991,7 @@ function getFemeasCompleto() {
       var pp=p.data.split('-');
       return pp[2]+'/'+pp[1]+'/'+pp[0]+(p.filhos?' ('+p.filhos+')':'');
     }).join('; ');
-    lista.push([num, nascFmt, '', p25Str, p26Str, '', '', a.obs||'']);
+    lista.push([num, nascFmt, '', p25Str, p26Str, '', '', obsAnimal]);
   });
 
   // Também enriquece fêmeas do PDF com parições do banco
@@ -2113,7 +2127,8 @@ async function saveParicao() {
       var brinco=brincos[i];
       if(!db.animais.find(function(a){ return a._id===brinco; })) {
         var sexo=brinco.startsWith('M')?'macho':'femea';
-        var novoAnimal={_id:brinco,id:brinco,sexo:sexo,nasc:data,mae:mae,pai:'',raca:'',conf:'',situacao:'ativo',pesoEntrada:null,pesoVenda:null,rend:null,brincoAnt:'',obs:'',_ts:Date.now()};
+        var obsAuto = (sexo==='femea'?'Filha':'Filho')+' de '+mae;
+        var novoAnimal={_id:brinco,id:brinco,sexo:sexo,nasc:data,mae:mae,pai:'',raca:'',conf:'',situacao:'ativo',pesoEntrada:null,pesoVenda:null,rend:null,brincoAnt:'',obs:obsAuto,_ts:Date.now()};
         db.animais.push(novoAnimal);
         await salvarAnimalSB(novoAnimal);
         cadastrados++;
