@@ -676,6 +676,7 @@ select option { background: var(--wood); }
         <thead>
           <tr>
             <th style="min-width:55px">Nº</th>
+            <th style="min-width:60px">Mãe</th>
             <th style="min-width:90px">Nascimento</th>
             <th style="min-width:90px">Morte</th>
             <th style="min-width:200px">Parição 2025</th>
@@ -1991,13 +1992,25 @@ function getFemeasCompleto() {
       var pp=p.data.split('-');
       return pp[2]+'/'+pp[1]+'/'+pp[0]+(p.filhos?' ('+p.filhos+')':'');
     }).join('; ');
-    lista.push([num, nascFmt, '', p25Str, p26Str, '', '', obsAnimal]);
+    lista.push([num, nascFmt, '', p25Str, p26Str, '', '', obsAnimal, a.mae||'']);
   });
 
-  // Também enriquece fêmeas do PDF com parições do banco
+  // Também enriquece fêmeas do PDF com parições e mãe do banco
   lista.forEach(function(row){
     var num = row[0];
     var femId = 'F'+String(num).padStart(3,'0');
+    // Se a fêmea não tem mãe ainda, busca no banco ou na observação
+    if(!row[8]) {
+      var animal = db.animais.find(function(a){ return a._id===femId; });
+      if(animal && animal.mae) {
+        row[8] = animal.mae;
+      } else {
+        // Tenta extrair "Filha de FXXX" ou "(FXXX)" da observação
+        var obs = row[7] || '';
+        var m = obs.match(/F\d{3,}/);
+        if(m) row[8] = m[0];
+      }
+    }
     var paricoes2026 = (db.paricoes||[]).filter(function(p){ return p.mae===femId && p.data && p.data.startsWith('2026'); });
     if(paricoes2026.length > 0) {
       var novoP26 = paricoes2026.map(function(p){
@@ -2036,14 +2049,15 @@ function renderFemeas() {
   if(tEl) tEl.textContent='Fêmeas — '+(titulos[filtroSit]||filtroSit)+' ('+lista.length+')';
   var tbody=document.getElementById('tbody-femeas');
   if(!tbody) return;
-  if(!lista.length) { tbody.innerHTML='<tr><td colspan="8"><div class="empty"><div class="empty-icon">♀</div><div class="empty-text">Nenhuma fêmea encontrada</div></div></td></tr>'; return; }
+  if(!lista.length) { tbody.innerHTML='<tr><td colspan="9"><div class="empty"><div class="empty-icon">♀</div><div class="empty-text">Nenhuma fêmea encontrada</div></div></td></tr>'; return; }
   var chk='<span style="color:var(--sprout);font-size:14px">✓</span>',crs='<span style="color:var(--border)">—</span>',rows='';
   for(var i=0;i<lista.length;i++) {
-    var r=lista[i],num=r[0],nasc=r[1],morte=r[2],p25=r[3],p26=r[4],vc=r[5],dc=r[6],obs=r[7];
+    var r=lista[i],num=r[0],nasc=r[1],morte=r[2],p25=r[3],p26=r[4],vc=r[5],dc=r[6],obs=r[7],mae=r[8]||'';
     var femId='F'+String(num).padStart(3,'0'),morta=!!morte;
     var rowBg=morta?'background:rgba(158,61,42,0.08);border-left:3px solid rgba(158,61,42,0.35)':'';
     rows+='<tr style="'+rowBg+'" class="row-link" data-femid="'+femId+'" data-num="'+num+'" onclick="openDetalheFemea(this.getAttribute("data-femid"),parseInt(this.getAttribute("data-num")))">'
       +'<td class="mono" style="font-weight:600;color:'+(morta?'var(--rust)':'var(--sprout)')+'">'+femId+'</td>'
+      +'<td class="mono" style="font-size:11px;color:var(--dust)">'+(mae||'—')+'</td>'
       +'<td style="font-size:11px;color:var(--dust)">'+(nasc||'—')+'</td>'
       +'<td style="font-size:11px;color:'+(morta?'var(--rust)':'var(--border)')+';">'+(morte||'—')+'</td>'
       +'<td style="font-size:11px">'+(p25||'—')+'</td>'
